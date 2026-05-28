@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climate_lib"
+version = "0.0.1"
+dependencies = ["numpy",
+    "pandas",
+    "xarray",
+    "scipy",
+    "dask",
+    "metpy",
+    "matplotlib",
+    "cartopy",
+    "sklearn",
+    "geocat",
+    "warnings"]
+authors = [{name = "Dhairya Chopra", email = "dhairyachopra2005@gmail.com"}]
+description = "Climate Functions for the M. Lague Lab"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/GGBoss101/knn_python_library"
+Issues = "https://github.com/GGBoss101/knn_python_library/issues"
