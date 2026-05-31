@@ -25,14 +25,11 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 
 
 def close_map(fig=None, ax=None):
-    """
-    Fully closes a Matplotlib/Cartopy figure and clears memory.
-    ax and/or fig passed, it will clear both individually
-    otherwise, it will close all figures.
+    """Fully closes a Matplotlib/Cartopy figure and clears memory. If ax and/or fig passed, it will clear both individually, otherwise, it will close all figures.
 
-    Parameters:
-    - fig: matplotlib Figure object (preferred)
-    - ax: optional axis (not required, included for flexibility)
+    Args:
+        fig: matplotlib Figure object (preferred)
+        ax: optional axis (not required, included for flexibility)
     """
 
     if ax is not None:
@@ -44,25 +41,18 @@ def close_map(fig=None, ax=None):
         plt.close("all")  # fallback: closes everything
 
 def NA_map(mapdata, cmap, clim, units="", title=""):
-    """
-    Plot a North America map from a 2D Xarray DataArray.
+    """Plot a North America map from a 2D Xarray DataArray.
 
-    Parameters:
-    - mapdata (DataArray): 2D data with latitude and longitude coordinates.
-                             Expected dimensions are typically (lat, lon).
-    - cmap (str or Colormap): Matplotlib colormap name/object.
-    - clim (tuple/list): Color limits as (vmin, vmax).
-    - units (str): Label for the colorbar units.
-    - title (str): Figure title.
+    Args:
+        mapdata (DataArray): 2D data with latitude and longitude coordinates. Expected dimensions are typically (lat, lon).
+        cmap (str or Colormap): Matplotlib colormap name/object.
+        clim (tuple/list): Color limits as (vmin, vmax).
+        units (str): Label for the colorbar units.
+        title (str): Figure title.
 
     Returns:
-    - fig (Figure): Matplotlib figure object.
-    - ax (GeoAxes): Cartopy map axis object.
-
-    Notes:
-    - Uses a PlateCarree projection.
-    - Map extent is fixed to North America.
-    - Automatically displays and closes the figure after plotting.
+        fig (Figure): Matplotlib figure object.
+        ax (GeoAxes): Cartopy map axis object.
     """
 
     # 1. Create figure and map projection

@@ -13,9 +13,8 @@ dependencies = ["numpy",
     "metpy",
     "matplotlib",
     "cartopy",
-    "sklearn",
-    "geocat",
-    "warnings"]
+    "scikit-learn",
+    "geocat.comp"]
 authors = [{name = "Dhairya Chopra", email = "dhairyachopra2005@gmail.com"}]
 description = "Climate Functions for the M. Lague Lab"
 readme = "README.md"

@@ -27,14 +27,15 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 def vert_integral(ds, var = None, g = 9.80665, pressure_factor = 100.0):
     """Vertically integrate a DataArray in pressure coordinates.
 
-    Parameters:
-    - ds (Dataset/DataArray): The input atmospheric data.
-    - var (str, optional): The specific variable name to extract from ds.
-    - g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
-    - pressure_factor (float): Multiplier to convert pressure units to Pascals
-    (default: 100.0 for hPa -> Pa).
-    # Returns:
-    - integral (DataArray): Vertically integrated field (time, lat, lon).
+    Args:
+        ds (Dataset/DataArray): The input atmospheric data.
+        var (str, optional): The specific variable name to extract from ds.
+        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
+        pressure_factor (float): Multiplier to convert pressure units to Pascals
+        (default: 100.0 for hPa -> Pa).
+
+    Returns:
+        integral (DataArray): Vertically integrated field (time, lat, lon).
     """
 
     # 1. Select the specific variable if a variable was passed
@@ -63,14 +64,14 @@ def vert_integral(ds, var = None, g = 9.80665, pressure_factor = 100.0):
 def vert_integral_optimized(da, var = None, g = 9.80665, pressure_factor = 100.0):
     """Vertically integrate a DataArray using Xarray's native calculus.
 
-    Parameters:
-    - da (Dataset/DataArray): The input atmospheric data.
-    - var (str, optional): The specific variable name to extract from da.
-    - g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
-    - pressure_factor (float): Multiplier to convert pressure units to Pascals
-    (default: 100.0 for hPa -> Pa).
+    Args:
+        da (Dataset/DataArray): The input atmospheric data.
+        var (str, optional): The specific variable name to extract from da.
+        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
+        pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
+
     Returns:
-    - integral (DataArray): Pressure-coordinate vertical integral
+        integral (DataArray): Pressure-coordinate vertical integral
     with dimensions (time, lat, lon).
     """
 
@@ -92,14 +93,14 @@ def vert_integral_optimized(da, var = None, g = 9.80665, pressure_factor = 100.0
 def vert_integral_hybrid(ds, var, ds_hybrid, g = 9.80665):
     """Vertically integrate a variable across hybrid sigma-pressure coordinates.
 
-    Parameters:
-    - ds (Dataset): Input dataset containing the variable to integrate.
-    - var (str): String name of the variable to extract (e.g., 'Q').
-    - ds_hybrid (Dataset/DataArray): Source dataset for the hybrid coefficients.
-    - g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
+    Args:
+        ds (Dataset): Input dataset containing the variable to integrate.
+        var (str): String name of the variable to extract (e.g., 'Q').
+        ds_hybrid (Dataset/DataArray): Source dataset for the hybrid coefficients.
+        g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
 
     Returns:
-    - total_int (DataArray): Vertically integrated result (e.g., kg/m² for Q).
+        total_int (DataArray): Vertically integrated result (e.g., kg/m² for Q).
     """
 
     # 1. Dynamically read reference surface pressure safely

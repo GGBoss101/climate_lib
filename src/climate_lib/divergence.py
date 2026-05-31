@@ -27,14 +27,13 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
     """Compute vertically integrated moisture flux divergence from CESM data.
 
-    Parameters:
-    - ds (Dataset): Input CESM dataset containing variables U, V, Q, PS,
-                    and hybrid coordinate coefficients.
-    - g (float): Gravitational acceleration in m/s^2 (default: 9.81).
-    - Re (float): Earth radius in meters (default: 6.371e6).
+    Args:
+        ds (Dataset): Input CESM dataset containing variables U, V, Q, PS, and hybrid coordinate coefficients.
+        g (float): Gravitational acceleration in m/s^2 (default: 9.81).
+        Re (float): Earth radius in meters (default: 6.371e6).
 
     Returns:
-    - qdiv (DataArray): Vertically integrated moisture divergence (kg m-2 s-1).
+        qdiv (DataArray): Vertically integrated moisture divergence (kg m-2 s-1).
     """
 
     hyai = ds.hyai
@@ -130,14 +129,15 @@ def dominguez_uqdiv(ds,
     Compute vertically integrated moisture flux divergence
     using pressure-level interpolation.
 
-    Parameters:
-    - ds (Dataset): CESM atmospheric dataset
-    - dPmb (float): Pressure spacing in hPa (default 25)
-    - g (float): Gravity (m/s²) (default 9.81)
-    - R (float): Planet radius (m) (default 6.37122e6 = Earth radius)
-    - pressure_factor (float): Factor to convert pressure levels to Pascals (default 100.0)
+    Args:
+        ds (Dataset): CESM atmospheric dataset
+        dPmb (float): Pressure spacing in hPa (default 25)
+        g (float): Gravity (m/s²) (default 9.81)
+        R (float): Planet radius (m) (default 6.37122e6 = Earth radius)
+        pressure_factor (float): Factor to convert pressure levels to Pascals (default 100.0)
+
     Returns:
-    - qdiv (DataArray): Moisture flux divergence (mm/day)
+        qdiv (DataArray): Moisture flux divergence (mm/day)
     """
     ds_ctrl = ds
     # Calculate moisture flux divergence (qv vi -> q_div -> diff -> tavg)

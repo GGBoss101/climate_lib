@@ -1,3 +1,4 @@
-from .climate_lib import divergence, linear, plotting, vertical_integral
-
-__all__ = ["divergence", "linear", "plotting", "vertical_integral"]
+from .divergence import *
+from .linear import *
+from .plotting import *
+from .vertical_integral import *

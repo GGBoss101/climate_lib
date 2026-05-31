@@ -28,19 +28,15 @@ def linear_trend(da):
     Compute linear regression statistics along the time dimension
     of an Xarray DataArray.
 
-    Parameters:
-    - da (DataArray): Input data with a "time" dimension.
+    Args:
+        da (DataArray): Input data with a "time" dimension.
 
     Returns:
-    - slope (DataArray): Linear trend slope.
-    - intercept (DataArray): Regression intercept.
-    - rvalue (DataArray): Correlation coefficient.
-    - pvalue (DataArray): Statistical p-value.
-    - stderr (DataArray): Standard error of the slope.
-
-    Notes:
-    - Uses scipy.stats.linregress.
-    - Supports Dask-backed arrays.
+        slope (DataArray): Linear trend slope.
+        intercept (DataArray): Regression intercept.
+        rvalue (DataArray): Correlation coefficient.
+        pvalue (DataArray): Statistical p-value.
+        stderr (DataArray): Standard error of the slope.
     """
 
     # Create numerical time coordinates for regression
