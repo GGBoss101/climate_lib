@@ -30,11 +30,13 @@ jobs:
 
       - name: Build Sphinx HTML
         run: |
-          # 1. Automatically scan codebase for docstrings
-          sphinx-apidoc -o docs/ . --force
+          # 1. Automatically generate the code stubs into the docs folder
+          sphinx-apidoc -o docs src/ --force
           
-          # 2. Build the documentation into HTML
-          sphinx-build -b html docs docs/_build/html
+          # 2. Change directories into docs and run your standard make commands
+          cd docs
+          make clean
+          make html
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
