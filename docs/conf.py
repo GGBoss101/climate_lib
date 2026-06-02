@@ -17,7 +17,7 @@ def purge_module_contents(app: Sphinx, *args: Any) -> None:
         with open(path, "r", encoding="utf-8") as f:
             content = f.read()
         
-        # Split the file right where the Module contents section begins
+        #splits the file right where the Module contents section begins
         if "Module contents" in content:
             clean_content = content.split("Module contents")[0].strip() + "\n"
             
@@ -25,7 +25,7 @@ def purge_module_contents(app: Sphinx, *args: Any) -> None:
                 f.write(clean_content)
 
 def setup(app: Sphinx) -> None:
-    # Runs right before Sphinx starts building your HTML pages
+    #runs right before Sphinx starts building HTML pages
     app.connect("builder-inited", purge_module_contents)
 
 # -- Project information -----------------------------------------------------

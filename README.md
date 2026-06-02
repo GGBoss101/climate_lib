@@ -5,4 +5,4 @@ or for only specific files:
 - from climate_lib import *file_name*
 
 ## Documentation
-It can be found at: <a href="https://ggboss101.github.io/climate_lib/" target="_blank">Documentation</a>
+It can be found at: <a href="https://ggboss101.github.io/climate_lib/">Documentation Link</a>
