@@ -3,7 +3,7 @@ name: Build and Deploy Sphinx Docs
 on:
   push:
     branches:
-      - main  # Change to master if your default branch is master
+      - main
 
 permissions:
   contents: write
