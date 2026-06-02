@@ -27,13 +27,18 @@ jobs:
           # install theme
           pip install sphinx pydata_sphinx_theme 
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # If you have a pyproject.toml or setup.py, uncomment the line below:
+          # pip install -e .
 
       - name: Build Sphinx HTML
         run: |
           # 1. Automatically generate the code stubs into the docs folder
           sphinx-apidoc -o docs src/ --force
           
-          # 2. Change directories into docs and run your standard make commands
+          # 2. Expose the src directory to Python so Sphinx can see the code during compilation
+          export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
+          
+          # 3. Change directories into docs and run your standard make commands
           cd docs
           make clean
           make html
@@ -43,4 +48,3 @@ jobs:
         with:
           folder: docs/_build/html
           branch: gh-pages
-
