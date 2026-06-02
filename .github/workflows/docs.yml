@@ -28,7 +28,7 @@ jobs:
           pip install sphinx pydata_sphinx_theme 
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           # If you have a pyproject.toml or setup.py, uncomment the line below:
-          # pip install -e .
+          pip install -e .
 
       - name: Build Sphinx HTML
         run: |
