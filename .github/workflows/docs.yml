@@ -24,8 +24,8 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Replace 'furo' with your exact theme package name
-          pip install sphinx furo 
+          # install theme
+          pip install sphinx pydata_sphinx_theme 
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Build Sphinx HTML
