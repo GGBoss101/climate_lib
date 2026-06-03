@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Sphinx HTML
         run: |
-          sphinx-apidoc --implicit-namespaces -f -o docs src/
+          sphinx-apidoc --implicit-namespaces -M -T -f -o docs src/climate_lib
           export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
           cd docs
           make clean

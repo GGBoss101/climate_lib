@@ -13,7 +13,6 @@ Welcome to climate_lib's documentation!
    climate_lib
 
 
-
 Indices and tables
 ==================
 
