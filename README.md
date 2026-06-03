@@ -42,5 +42,5 @@ from climate_lib import *
 ```
 or for only specific files:
 ```python
-from climate_lib import *file_name*
+from climate_lib import <file_name>
 ```
