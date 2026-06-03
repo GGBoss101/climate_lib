@@ -35,3 +35,11 @@ src.climate\_lib.vertical\_integral module
    :members:
    :show-inheritance:
    :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: src.climate_lib
+   :members:
+   :show-inheritance:
+   :undoc-members:
