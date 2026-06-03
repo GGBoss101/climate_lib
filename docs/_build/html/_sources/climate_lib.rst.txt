@@ -1,9 +1,6 @@
 climate\_lib package
 ====================
 
-Submodules
-----------
-
 climate\_lib.divergence module
 ------------------------------
 

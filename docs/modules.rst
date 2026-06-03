@@ -1,4 +1,4 @@
-src
+climate_lib
 ===
 
 .. toctree::
