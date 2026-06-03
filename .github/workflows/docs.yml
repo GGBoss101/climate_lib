@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Sphinx HTML
         run: |
-          sphinx-apidoc -o docs src/ --force
+          sphinx-apidoc --implicit-namespaces -f -o docs src/
           export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
           cd docs
           make clean
