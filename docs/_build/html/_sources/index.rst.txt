@@ -10,7 +10,7 @@ Welcome to climate_lib's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   climate_lib
+   Module Layout <climate_lib>
 
 
 Indices and tables
