@@ -366,7 +366,7 @@
 <span class="sd">        ax (GeoAxes): Cartopy map axis object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># 1. Create figure and map projection</span>
+    <span class="c1"># Create figure and map projection</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
         <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -375,7 +375,7 @@
         <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;projection&quot;</span><span class="p">:</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">()},</span>
     <span class="p">)</span>
 
-    <span class="c1"># 2. Add geographic features</span>
+    <span class="c1"># Add geographic features</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">coastlines</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
@@ -390,23 +390,16 @@
         <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># 3. Restrict map view to North America</span>
+    <span class="c1"># Restrict map view to North America</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_extent</span><span class="p">(</span>
         <span class="p">[</span><span class="mi">220</span><span class="p">,</span> <span class="mi">280</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>
         <span class="n">crs</span><span class="o">=</span><span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">(),</span>
     <span class="p">)</span>
 
-    <span class="c1"># 4. Plot the data</span>
+    <span class="c1"># Plot the data</span>
 
     <span class="c1"># pcolormesh draws colored grid cells.</span>
-    <span class="c1">#</span>
-    <span class="c1"># mapdata.lon -&gt; x coordinates</span>
-    <span class="c1"># mapdata.lat -&gt; y coordinates</span>
-    <span class="c1"># mapdata     -&gt; actual values</span>
-    <span class="c1">#</span>
-    <span class="c1"># shading=&quot;auto&quot; avoids grid-size warnings</span>
-    <span class="c1"># and improves compatibility with newer matplotlib.</span>
 
     <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
         <span class="n">mapdata</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
@@ -419,11 +412,11 @@
         <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># 5. Add title</span>
+    <span class="c1"># Add title</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 
-    <span class="c1"># 6. Create colorbar</span>
+    <span class="c1"># Create colorbar</span>
 
     <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
         <span class="n">cs</span><span class="p">,</span>
@@ -440,7 +433,7 @@
         <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="c1"># 7. Display the figure</span>
+    <span class="c1"># Display the figure</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
