@@ -48,24 +48,24 @@ def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
     V = ds.V
     Q = ds.Q
 
-    # 1. Compute pressure at interfaces (Pa)
+    # Compute pressure at interfaces (Pa)
     # CESM formula: p = A * P0 + B * PS
     p_int = hyai * P0 + hybi * PS
 
-    # 2. Compute pressure thickness Δp between interfaces
+    # Compute pressure thickness Δp between interfaces
     dp_raw = p_int.diff(dim="ilev")
     
     # Swap the coordinate dimension name from 'ilev' to 'lev' 
     dp = dp_raw.rename({"ilev": "lev"}).assign_coords(lev=ds.lev)
 
-    # 3. Moisture fluxes and vertical integration
+    # Moisture fluxes and vertical integration
     # Combines flux calculations and integration into streamlined memory passes.
     UQ = U * Q
     VQ = V * Q
     uq_int = (UQ * dp).sum(dim = "lev") / g
     vq_int = (VQ * dp).sum(dim = "lev") / g
 
-    # 4. Compute horizontal divergence in spherical coordinates
+    # Compute horizontal divergence in spherical coordinates
     # Convert latitude to radians to scale grid cell sizes by latitude circles
     lat_rad = np.deg2rad(ds.lat)
     coslat = np.cos(lat_rad)
@@ -86,7 +86,7 @@ def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
     # Combined horizontal moisture divergence
     qdiv = du_dx + dv_dy
 
-    # 5. Attach Metadata (Modifies attributes directly on the generated array)
+    # Attach Metadata (Modifies attributes directly on the generated array)
     qdiv.name = "QDIV"
     qdiv.attrs = {
         "long_name": "Vertically integrated water vapor divergence",
@@ -114,11 +114,6 @@ def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0p
                           attrs={'long_name': var_ctrl.long_name, 'units': var_ctrl.units})
 
     return var_ctrl_out
-
-
-# Try doing divergence first, then integrating
-# or try some other way of masking surface pressure/topography
-# or keep it all ways except don't interpolate to pressure, keep hybrid sigma layers and their dP? 
 
 def dominguez_uqdiv(ds,
     dPmb = 25,
@@ -160,7 +155,7 @@ def dominguez_uqdiv(ds,
     dPmb = 25
     pnew = (np.arange(100, 1000 + dPmb, dPmb))
 
-    #Convert units to Pascals
+    # Convert units to Pascals
     dP = dPmb * pressure_factor
     pnew = pnew * pressure_factor
 
@@ -174,10 +169,6 @@ def dominguez_uqdiv(ds,
     psrf_ctrl = ds_ctrl.PS  # (time:30, lat:192, lon:288)
     P0pa_ctrl = ds_ctrl.P0  # (time:30)
 
-
-    # # --------------------------------------------------
-    # # vertical interpolation of variables onto this new grid... 
-    # # --------------------------------------------------    
     U_ctrl = vertically_interpolate('U', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl)
     V_ctrl = vertically_interpolate('V', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl)
     Q_ctrl = vertically_interpolate('Q', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl)
@@ -192,7 +183,6 @@ def dominguez_uqdiv(ds,
 
 
     # get the cosine stuff in
-    
     lat_rad = np.deg2rad(lat)
     lon_rad = np.deg2rad(lon)
 
@@ -205,13 +195,9 @@ def dominguez_uqdiv(ds,
     # q_div
     Z_ctrl_tmp = VIMF_ctrl_x*float('nan')
     
-    # Z_exp_tmp = VIMF_ctrl_x*float('nan')
     for i in range(VIMF_ctrl_x.shape[0]):
         U_ctrl_tmp = VIMF_ctrl_x[i, :, :]
         V_ctrl_tmp = VIMF_ctrl_y[i, :, :]
-
-        # Fx = VIMF_ctrl_x[i,:,:]
-        # Fy = VIMF_ctrl_y[i,:,:]
 
         # ∂(Fx cosφ)/∂λ
         term1 = np.gradient(U_ctrl_tmp * cosphi[:,None], lon_rad, axis=1) / (R * cosphi[:,None])

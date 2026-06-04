@@ -55,7 +55,7 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
         ax (GeoAxes): Cartopy map axis object.
     """
 
-    # 1. Create figure and map projection
+    # Create figure and map projection
 
     fig, ax = plt.subplots(
         ncols=1,
@@ -64,7 +64,7 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
         subplot_kw={"projection": ccrs.PlateCarree()},
     )
 
-    # 2. Add geographic features
+    # Add geographic features
 
     ax.coastlines(linewidth=0.5)
 
@@ -79,23 +79,16 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
         linewidth=0.5,
     )
 
-    # 3. Restrict map view to North America
+    # Restrict map view to North America
 
     ax.set_extent(
         [220, 280, 0, 60],
         crs=ccrs.PlateCarree(),
     )
 
-    # 4. Plot the data
+    # Plot the data
 
     # pcolormesh draws colored grid cells.
-    #
-    # mapdata.lon -> x coordinates
-    # mapdata.lat -> y coordinates
-    # mapdata     -> actual values
-    #
-    # shading="auto" avoids grid-size warnings
-    # and improves compatibility with newer matplotlib.
 
     cs = ax.pcolormesh(
         mapdata.lon,
@@ -108,11 +101,11 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
         shading="auto",
     )
 
-    # 5. Add title
+    # Add title
 
     ax.set_title(title, fontsize=15)
 
-    # 6. Create colorbar
+    # Create colorbar
 
     cbar = fig.colorbar(
         cs,
@@ -129,7 +122,7 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
         fontsize=15,
     )
 
-    # 7. Display the figure
+    # Display the figure
 
     plt.show()
 
