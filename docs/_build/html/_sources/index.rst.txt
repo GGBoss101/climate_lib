@@ -10,6 +10,7 @@ Welcome to climate_lib's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Constants <climate_lib.constants>
    Module Layout <climate_lib>
 
 

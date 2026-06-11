@@ -29,7 +29,7 @@ extensions = [
 html_show_sourcelink = False
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'src/climate_lib/constants.py', 'src/climate_lib/utils.py']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '../src/climate_lib/utils.py']
 
 napoleon_custom_sections = [('Returns', 'params_style')]
 

@@ -9,18 +9,26 @@ climate\_lib package
 Submodules
 ----------
 
-climate\_lib.divergence module
-------------------------------
+climate\_lib.cesm module
+------------------------
 
-.. automodule:: climate_lib.divergence
+.. automodule:: climate_lib.cesm
    :members:
    :show-inheritance:
    :undoc-members:
 
-climate\_lib.linear module
---------------------------
+climate\_lib.compute module
+---------------------------
 
-.. automodule:: climate_lib.linear
+.. automodule:: climate_lib.compute
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+climate\_lib.constants module
+-----------------------------
+
+.. automodule:: climate_lib.constants
    :members:
    :show-inheritance:
    :undoc-members:
@@ -33,10 +41,10 @@ climate\_lib.plotting module
    :show-inheritance:
    :undoc-members:
 
-climate\_lib.vertical\_integral module
---------------------------------------
+climate\_lib.utils module
+-------------------------
 
-.. automodule:: climate_lib.vertical_integral
+.. automodule:: climate_lib.utils
    :members:
    :show-inheritance:
    :undoc-members:
