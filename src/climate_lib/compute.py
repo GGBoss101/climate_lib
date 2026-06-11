@@ -1,3 +1,7 @@
+"""
+This module contains functions for computing various atmospheric diagnostics.
+"""
+
 # import modules
 import numpy as np
 import pandas as pd
@@ -18,6 +22,8 @@ from sklearn.linear_model import LinearRegression
 
 # import Ngl
 import geocat.comp
+
+from climate_lib.utils import *
 
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
@@ -387,3 +393,56 @@ def linear_trend(da):
         pvalue,
         stderr,
     )
+
+#=====================
+# General Calculations
+#=====================
+
+def ds_add_alb(ds):
+    """
+    Add surface and top-of-atmosphere albedo variables to a dataset.
+
+    Computes full-sky and clear-sky albedo at both the surface and the
+    top of the atmosphere (TOA) using the ``albedo`` helper function, and
+    stores the results as new variables in the dataset.
+
+    Args:
+        ds (xarray.Dataset): Dataset containing the radiation variables required for albedo calculations: ``FSDS``, ``FSNS``, ``FSDSC``, ``FSNSC``, ``SOLIN``, ``FSNT``, and ``FSNTC``.
+
+    Returns:
+        ds (xarray.Dataset): The input dataset with the following additional variables:
+
+            * ``albedo_sfc_fullsky``: Surface albedo under all-sky conditions.
+            * ``albedo_sfc_clearsky``: Surface albedo under clear-sky conditions.
+            * ``albedo_toa_fullsky``: TOA albedo under all-sky conditions.
+            * ``albedo_toa_clearsky``: TOA albedo under clear-sky conditions.
+    """
+    # Compute surface albedo using all-sky shortwave fluxes.
+    ds['albedo_sfc_fullsky'] = albedo(ds['FSDS'], ds['FSNS'])
+
+    # Compute surface albedo using clear-sky shortwave fluxes.
+    ds['albedo_sfc_clearsky'] = albedo(ds['FSDSC'], ds['FSNSC'])
+
+    # Compute TOA albedo using all-sky shortwave fluxes.
+    ds['albedo_toa_fullsky'] = albedo(ds['SOLIN'], ds['FSNT'])
+
+    # Compute TOA albedo using clear-sky shortwave fluxes.
+    ds['albedo_toa_clearsky'] = albedo(ds['SOLIN'], ds['FSNTC'])
+
+    return ds
+
+def ds_add_rain(ds):
+    """Compute total precipitation and add it to the dataset.
+
+    Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.
+
+    Args:
+        ds (xarray.Dataset): Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.
+
+    Returns:
+        ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.
+    """
+    # Total precipitation = convective + large-scale (all components)
+    ds['rain'] = ds['PRECC'] + ds['PRECL'] + ds['PRECSC'] + ds['PRECSL']
+
+    return ds

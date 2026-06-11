@@ -1,3 +1,7 @@
+"""
+This module contains functions concerning CESM datasets.
+"""
+
 import sys
 
 # netcdf/numpy/xarray
@@ -41,9 +45,11 @@ import dask.bag as db
 
 from scipy import interpolate
 
+from climate_lib.utils import *
+
 
 def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal_mean = None, mirror_zonal_mean = None):
-    '''
+    """
     Create copy of an input file to calculate the idealized equivalent with several methods by erasing the geographical signature
     of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_mean and/or zeros values.
 
@@ -61,14 +67,14 @@ def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal
         ds_mean_new (xarray): new dataset with global mean
         ds_zonal_new (xarray): new dataset with zonal mean
         ds_mirror_zonal_new (xarray): new dataset with mirrored zonal mean
-    '''    
+    """   
     # Creation of new Datasets
     ds_mirror_zonal_new = ds_old.copy()
     ds_zeros = ds_old.copy()
     ds_mean_new = ds_old.copy()
     ds_zonal_new = ds_old.copy()
     
-    # do global mean area weighted average
+    # Do global mean area weighted average
     weights = np.cos(np.deg2rad(ds_old.lat))
     weights.name = "weights"
 
@@ -114,3 +120,43 @@ def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal
 
 
     return ds_zeros, ds_mean_new, ds_zonal_new, ds_mirror_zonal_new
+
+
+def cesm_time(ds):
+    """
+    Adjust CESM time coordinates and restrict data to years 20–49.
+
+    CESM monthly output timestamps are shifted 15 days backward so that
+    each timestamp aligns with the month represented by the data. After
+    adjusting the time coordinate, all records outside simulation years
+    20–49 are removed.
+
+    Args:
+        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with
+            valid ``units`` and ``calendar`` attributes compatible with
+            ``cftime.num2date``.
+
+    Returns:
+        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.
+
+    Notes:
+        The 15-day offset is applied to align monthly averages with the
+        calendar month they represent. Data from years before 20 or after
+        49 are dropped.
+    """
+    # Shift timestamps backward by 15 days to align monthly means with
+    # the calendar month represented by the data.
+    time2 = cftime.num2date(
+        ds['time'].values[:] - 15,
+        units=ds['time'].units,
+        calendar=ds['time'].calendar,
+        only_use_cftime_datetimes = True,
+    )
+
+    # Replace the dataset's time coordinate with the adjusted timestamps.
+    ds = ds.assign_coords({'time': time2})
+
+    # Retain only years 20–49 of the simulation.
+    ds = ds.where(ds['time'].dt.year.isin(range(20, 50)), drop=True)
+
+    return ds

@@ -1,3 +1,7 @@
+"""
+This module contains functions for plotting climate data, including maps and other visualizations.
+"""
+
 # import modules
 import numpy as np
 import pandas as pd
@@ -19,10 +23,11 @@ from sklearn.linear_model import LinearRegression
 # import Ngl
 import geocat.comp
 
+from climate_lib.utils import *
+
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
-
 
 def close_map(fig=None, ax=None):
     """Fully closes a Matplotlib/Cartopy figure and clears memory. If ax and/or fig passed, it will clear both individually, otherwise, it will close all figures.

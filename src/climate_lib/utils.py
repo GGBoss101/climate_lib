@@ -1,3 +1,7 @@
+"""
+This module contains helper functions for climateLib, can also be imported/used for other purposes.
+"""
+
 # import modules
 import numpy as np
 import pandas as pd
@@ -23,10 +27,22 @@ import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
 
-# Helper functions for climateLib, can also be imported/used for other purposes.
-
 def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl):
+    """
+    Vertically interpolate a variable from hybrid sigma-pressure coordinates to specified pressure levels.
 
+    Args:
+        varname (str): Name of the variable to interpolate (e.g., 'T', 'U', 'V').
+        ds_ctrl (xarray.Dataset): Original dataset containing the variable in hybrid coordinates.
+        pnew (array-like): New pressure levels to interpolate to (in hPa).
+        PS (xarray.DataArray): Surface pressure variable from the dataset.
+        hyam_ctrl (xarray.DataArray): Hybrid A coefficients for the control dataset.
+        hybm_ctrl (xarray.DataArray): Hybrid B coefficients for the control dataset.
+        P0pa_ctrl (xarray.DataArray): Reference pressure level (usually 100000 Pa) for the control dataset.
+        
+    Returns:
+        var_ctrl_out (xarray.DataArray): The variable interpolated to the new pressure levels, with dimensions (time, lev, lat, lon).
+    """
     var_ctrl = ds_ctrl[varname]  # (time:30, lev:30, lat:192, lon:288)
     # Vertical interpolation
     var_ctrl_tmp = np.ones((var_ctrl.shape[0], len(pnew), var_ctrl.shape[2], var_ctrl.shape[3]))*float('nan')
@@ -44,3 +60,18 @@ def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0p
                           attrs={'long_name': var_ctrl.long_name, 'units': var_ctrl.units})
 
     return var_ctrl_out
+
+def albedo(swdn, swnet):
+    """
+    Compute surface albedo from downward and net shortwave radiation.
+
+    Args:
+        swdn (xarray.DataArray or numpy.ndarray): Downward shortwave radiation at the surface.
+        swnet (xarray.DataArray or numpy.ndarray): Net shortwave radiation at the surface.
+
+    Returns:
+        alpha(xarray.DataArray or numpy.ndarray): Surface albedo (same type and shape as input arrays).
+    """
+    swup = swdn - swnet
+    alpha = swup / swdn
+    return alpha
