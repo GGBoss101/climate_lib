@@ -304,7 +304,11 @@
                 <article class="bd-article">
                   
   <h1>Source code for climate_lib.plotting</h1><div class="highlight"><pre>
-<span></span><span class="c1"># import modules</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions for plotting climate data, including maps and other visualizations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># import modules</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -325,10 +329,11 @@
 <span class="c1"># import Ngl</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">geocat.comp</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Interpolation point out of data bounds encountered&quot;</span><span class="p">)</span>
-
 
 <div class="viewcode-block" id="close_map">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.plotting.close_map">[docs]</a>
