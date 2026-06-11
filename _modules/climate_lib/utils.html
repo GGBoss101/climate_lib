@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>climate_lib.linear &#8212; climate_lib 0.0.1 documentation</title>
+    <title>climate_lib.utils &#8212; climate_lib 0.0.1 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
     <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/climate_lib/linear';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/climate_lib/utils';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -286,7 +286,7 @@
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">climate_lib.linear</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">climate_lib.utils</span></li>
   </ul>
 </nav>
 </div>
@@ -303,7 +303,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for climate_lib.linear</h1><div class="highlight"><pre>
+  <h1>Source code for climate_lib.utils</h1><div class="highlight"><pre>
 <span></span><span class="c1"># import modules</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -329,66 +329,29 @@
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Interpolation point out of data bounds encountered&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="linear_trend">
-<a class="viewcode-back" href="../../climate_lib.html#climate_lib.linear.linear_trend">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">linear_trend</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute linear regression statistics along the time dimension</span>
-<span class="sd">    of an Xarray DataArray.</span>
+<span class="c1"># Helper functions for climateLib, can also be imported/used for other purposes.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        da (DataArray): Input data with a &quot;time&quot; dimension.</span>
+<div class="viewcode-block" id="vertically_interpolate">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.vertically_interpolate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vertically_interpolate</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">):</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        slope (DataArray): Linear trend slope.</span>
-<span class="sd">        intercept (DataArray): Regression intercept.</span>
-<span class="sd">        rvalue (DataArray): Correlation coefficient.</span>
-<span class="sd">        pvalue (DataArray): Statistical p-value.</span>
-<span class="sd">        stderr (DataArray): Standard error of the slope.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">var_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>  <span class="c1"># (time:30, lev:30, lat:192, lon:288)</span>
+    <span class="c1"># Vertical interpolation</span>
+    <span class="n">var_ctrl_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">pnew</span><span class="p">),</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds_ctrl</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="c1"># try with geocat instead of ngl</span>
+       <span class="n">var_ctrl_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:,:]</span> <span class="o">=</span> <span class="n">geocat</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">interp_hybrid_to_pressure</span><span class="p">(</span><span class="n">var_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> 
+                                    <span class="n">PS</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hyam_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hybm_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">p0</span><span class="o">=</span><span class="n">P0pa_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                    <span class="n">new_levels</span><span class="o">=</span><span class="n">pnew</span><span class="p">,</span> 
+                                    <span class="n">lev_dim</span><span class="o">=</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span> 
+                                    <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_bot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_sfc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    
+    <span class="n">var_ctrl_out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">var_ctrl_tmp</span><span class="p">,</span> 
+                          <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> 
+                          <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s1">&#39;lev&#39;</span><span class="p">:</span><span class="n">pnew</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lon</span><span class="p">},</span> 
+                          <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">units</span><span class="p">})</span>
 
-    <span class="c1"># Create numerical time coordinates for regression</span>
-    <span class="n">time_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]))</span>
-
-    <span class="c1"># Wrapper around scipy linear regression</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_linregress</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-
-        <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span>
-            <span class="n">time_coords</span><span class="p">,</span>
-            <span class="n">y</span><span class="p">,</span>
-        <span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
-
-    <span class="c1"># Apply regression along the time dimension</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
-        <span class="n">_linregress</span><span class="p">,</span>
-        <span class="n">da</span><span class="p">,</span>
-        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;time&quot;</span><span class="p">]],</span>
-        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]],</span>
-        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;parallelized&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Extract regression outputs</span>
-    <span class="n">slope</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;slope&quot;</span><span class="p">)</span>
-    <span class="n">intercept</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;intercept&quot;</span><span class="p">)</span>
-    <span class="n">rvalue</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;rvalue&quot;</span><span class="p">)</span>
-    <span class="n">pvalue</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;pvalue&quot;</span><span class="p">)</span>
-    <span class="n">stderr</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;stderr&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">slope</span><span class="p">,</span>
-        <span class="n">intercept</span><span class="p">,</span>
-        <span class="n">rvalue</span><span class="p">,</span>
-        <span class="n">pvalue</span><span class="p">,</span>
-        <span class="n">stderr</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">var_ctrl_out</span></div>
 
 </pre></div>
 
