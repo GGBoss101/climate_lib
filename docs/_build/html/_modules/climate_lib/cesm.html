@@ -304,7 +304,11 @@
                 <article class="bd-article">
                   
   <h1>Source code for climate_lib.cesm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions concerning CESM datasets.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># netcdf/numpy/xarray</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -347,11 +351,13 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
 
 <div class="viewcode-block" id="modify_cesm">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.modify_cesm">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">modify_cesm</span><span class="p">(</span><span class="n">ds_old</span><span class="p">,</span> <span class="n">var_list</span><span class="p">,</span> <span class="n">zeros</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">global_mean</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">simple_zonal_mean</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mirror_zonal_mean</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create copy of an input file to calculate the idealized equivalent with several methods by erasing the geographical signature</span>
 <span class="sd">    of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_mean and/or zeros values.</span>
 
@@ -369,14 +375,14 @@
 <span class="sd">        ds_mean_new (xarray): new dataset with global mean</span>
 <span class="sd">        ds_zonal_new (xarray): new dataset with zonal mean</span>
 <span class="sd">        ds_mirror_zonal_new (xarray): new dataset with mirrored zonal mean</span>
-<span class="sd">    &#39;&#39;&#39;</span>    
+<span class="sd">    &quot;&quot;&quot;</span>   
     <span class="c1"># Creation of new Datasets</span>
     <span class="n">ds_mirror_zonal_new</span> <span class="o">=</span> <span class="n">ds_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">ds_zeros</span> <span class="o">=</span> <span class="n">ds_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">ds_mean_new</span> <span class="o">=</span> <span class="n">ds_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">ds_zonal_new</span> <span class="o">=</span> <span class="n">ds_old</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     
-    <span class="c1"># do global mean area weighted average</span>
+    <span class="c1"># Do global mean area weighted average</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ds_old</span><span class="o">.</span><span class="n">lat</span><span class="p">))</span>
     <span class="n">weights</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;weights&quot;</span>
 
@@ -422,6 +428,49 @@
 
 
     <span class="k">return</span> <span class="n">ds_zeros</span><span class="p">,</span> <span class="n">ds_mean_new</span><span class="p">,</span> <span class="n">ds_zonal_new</span><span class="p">,</span> <span class="n">ds_mirror_zonal_new</span></div>
+
+
+
+<div class="viewcode-block" id="cesm_time">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.cesm_time">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cesm_time</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjust CESM time coordinates and restrict data to years 20–49.</span>
+
+<span class="sd">    CESM monthly output timestamps are shifted 15 days backward so that</span>
+<span class="sd">    each timestamp aligns with the month represented by the data. After</span>
+<span class="sd">    adjusting the time coordinate, all records outside simulation years</span>
+<span class="sd">    20–49 are removed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with</span>
+<span class="sd">            valid ``units`` and ``calendar`` attributes compatible with</span>
+<span class="sd">            ``cftime.num2date``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The 15-day offset is applied to align monthly averages with the</span>
+<span class="sd">        calendar month they represent. Data from years before 20 or after</span>
+<span class="sd">        49 are dropped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Shift timestamps backward by 15 days to align monthly means with</span>
+    <span class="c1"># the calendar month represented by the data.</span>
+    <span class="n">time2</span> <span class="o">=</span> <span class="n">cftime</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span>
+        <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]</span> <span class="o">-</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+        <span class="n">calendar</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span>
+        <span class="n">only_use_cftime_datetimes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Replace the dataset&#39;s time coordinate with the adjusted timestamps.</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">time2</span><span class="p">})</span>
+
+    <span class="c1"># Retain only years 20–49 of the simulation.</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">)),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ds</span></div>
 
 </pre></div>
 
