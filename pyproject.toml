@@ -14,7 +14,11 @@ dependencies = ["numpy",
     "matplotlib",
     "cartopy",
     "scikit-learn",
-    "geocat.comp"]
+    "geocat.comp",
+    "scipy",
+    "netCDF4",
+    "cftime",
+    ]
 authors = [{name = "Dhairya Chopra", email = "dhairyachopra2005@gmail.com"}]
 description = "Climate Functions for the M. Lague Lab"
 readme = "README.md"

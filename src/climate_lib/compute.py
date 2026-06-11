@@ -23,6 +23,116 @@ import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
 
+#===============================
+# Vertical integration functions
+#===============================
+def vert_integral(ds, var = None, g = 9.80665, pressure_factor = 100.0):
+    """Vertically integrate a DataArray in pressure coordinates.
+
+    Args:
+        ds (Dataset/DataArray): The input atmospheric data.
+        var (str, optional): The specific variable name to extract from ds.
+        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
+        pressure_factor (float): Multiplier to convert pressure units to Pascals
+        (default: 100.0 for hPa -> Pa).
+
+    Returns:
+        integral (DataArray): Vertically integrated field (time, lat, lon).
+    """
+
+    # Select the specific variable if a variable was passed
+    if var is not None:
+        da = ds[var]
+    else:
+        da = ds
+
+    # Calculate layer thicknesses from interface levels (ilev)
+    interface_diffs = ds.ilev.diff(dim="ilev")
+
+    # Convert to a DataArray for thickness using the mid-level (lev) coordinates
+    dp = interface_diffs.rename({"ilev": "lev"}).assign_coords(lev=da.lev)
+
+    # Scale the thicknesses to Pascals (e.g., hPa -> Pa)
+    dp = dp * pressure_factor
+
+    # Multiply the data by the layer thickness
+    weighted_data = da * dp
+
+    # Sum along the vertical axis and divide by gravity
+    integral = weighted_data.sum(dim = "lev") / g
+
+    return integral
+
+def vert_integral_optimized(da, var = None, g = 9.80665, pressure_factor = 100.0):
+    """Vertically integrate a DataArray using Xarray's native calculus.
+
+    Args:
+        da (Dataset/DataArray): The input atmospheric data.
+        var (str, optional): The specific variable name to extract from da.
+        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
+        pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
+
+    Returns:
+        integral (DataArray): Pressure-coordinate vertical integral
+    with dimensions (time, lat, lon).
+    """
+
+    # Select the specific variable if a Dataset was passed
+    if var is not None:
+        da = da[var]
+
+    # Scale the vertical coordinate values to Pascals (e.g., hPa -> Pa)
+    da_scaled = da.assign_coords(lev = da.lev * pressure_factor)
+
+    # Perform the mathematical integration along the vertical axis
+    raw_integral = da_scaled.integrate(dim = "lev")
+
+    # Divide the column by gravity to get mass-weighted units
+    integral = raw_integral / g
+
+    return integral
+
+def vert_integral_hybrid(ds, var, ds_hybrid, g = 9.80665):
+    """Vertically integrate a variable across hybrid sigma-pressure coordinates.
+
+    Args:
+        ds (Dataset): Input dataset containing the variable to integrate.
+        var (str): String name of the variable to extract (e.g., 'Q').
+        ds_hybrid (Dataset/DataArray): Source dataset for the hybrid coefficients.
+        g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
+
+    Returns:
+        total_int (DataArray): Vertically integrated result (e.g., kg/m² for Q).
+    """
+
+    # Dynamically read reference surface pressure safely
+    # Falls back to 100000.0 Pa if P0 is missing from the dataset attributes/variables
+    P0 = ds.get("P0", ds_hybrid.get("P0", 100000.0))
+
+    # Extract necessary variables
+    q = ds[var]
+    PS = ds_hybrid.PS
+    hyai = ds_hybrid.hyai
+    hybi = ds_hybrid.hybi
+
+    # Compute interface pressures (in Pa)
+    # CESM formula: P_interfaces = A(k)*P0 + B(k)*PS
+    P_i = hyai * P0 + hybi * PS
+
+    # Compute pressure thickness (dp) natively using .diff()
+    # .data preserves underlying Dask chunks and strips indexing mismatched names
+    dp_raw = P_i.diff(dim = "ilev").data
+
+    # Build dp directly using the target data's dimensions and coordinates
+    # This replaces the slow .copy() and .values assignment entirely
+    dp = xr.DataArray(dp_raw, dims = q.dims, coords = q.coords)
+
+    # Compute mass-weighted column layer values and sum over vertical axis
+    # Xarray handles broadcasting automatically; no manual transposing needed
+    layer_int = (q * dp) / g
+    total_int = layer_int.sum(dim = "lev", skipna = True)
+
+    return total_int
 
 def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
     """Compute vertically integrated moisture flux divergence from CESM data.
@@ -95,25 +205,9 @@ def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
 
     return qdiv
 
-def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl):
-
-    var_ctrl = ds_ctrl[varname]  # (time:30, lev:30, lat:192, lon:288)
-    # Vertical interpolation
-    var_ctrl_tmp = np.ones((var_ctrl.shape[0], len(pnew), var_ctrl.shape[2], var_ctrl.shape[3]))*float('nan')
-    for i in range(ds_ctrl['time'].size):
-        # try with geocat instead of ngl
-       var_ctrl_tmp[i,:,:,:] = geocat.comp.interpolation.interp_hybrid_to_pressure(var_ctrl[i], 
-                                    PS[i], hyam_ctrl[i], hybm_ctrl[i], p0=P0pa_ctrl[i],
-                                    new_levels=pnew, 
-                                    lev_dim='lev', 
-                                    method='linear', extrapolate=False, variable=None, t_bot=None, phi_sfc=None)
-    
-    var_ctrl_out = xr.DataArray(data=var_ctrl_tmp, 
-                          dims=['time','lev','lat','lon'], 
-                          coords={'time':var_ctrl.time, 'lev':pnew, 'lat':var_ctrl.lat, 'lon':var_ctrl.lon}, 
-                          attrs={'long_name': var_ctrl.long_name, 'units': var_ctrl.units})
-
-    return var_ctrl_out
+#=====================
+# Divergence functions
+#=====================
 
 def dominguez_uqdiv(ds,
     dPmb = 25,
@@ -230,3 +324,66 @@ def dominguez_uqdiv(ds,
     ctrl_q_div = xr.Dataset({'VIMF_x': VIMF_ctrl_x_da, 'VIMF_y': VIMF_ctrl_y_da, 'q_div': q_div_ctrl_da})
 
     return q_div_ctrl_da
+
+#============================
+# Linear regression functions
+#============================
+
+def linear_trend(da):
+    """
+    Compute linear regression statistics along the time dimension
+    of an Xarray DataArray.
+
+    Args:
+        da (DataArray): Input data with a "time" dimension.
+
+    Returns:
+        slope (DataArray): Linear trend slope.
+        intercept (DataArray): Regression intercept.
+        rvalue (DataArray): Correlation coefficient.
+        pvalue (DataArray): Statistical p-value.
+        stderr (DataArray): Standard error of the slope.
+    """
+
+    # Create numerical time coordinates for regression
+    time_coords = np.arange(len(da["time"]))
+
+    # Wrapper around scipy linear regression
+    def _linregress(y):
+
+        return stats.linregress(
+            time_coords,
+            y,
+        )[:5]
+
+    # Apply regression along the time dimension
+    results = xr.apply_ufunc(
+        _linregress,
+        da,
+        vectorize=True,
+        input_core_dims=[["time"]],
+        output_core_dims=[[], [], [], [], []],
+        output_dtypes=[
+            np.float64,
+            np.float64,
+            np.float64,
+            np.float64,
+            np.float64,
+        ],
+        dask="parallelized",
+    )
+
+    # Extract regression outputs
+    slope = results[0].rename("slope")
+    intercept = results[1].rename("intercept")
+    rvalue = results[2].rename("rvalue")
+    pvalue = results[3].rename("pvalue")
+    stderr = results[4].rename("stderr")
+
+    return (
+        slope,
+        intercept,
+        rvalue,
+        pvalue,
+        stderr,
+    )
