@@ -46,6 +46,7 @@ import dask.bag as db
 from scipy import interpolate
 
 from climate_lib.utils import *
+from climate_lib.constants import *
 
 
 def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal_mean = None, mirror_zonal_mean = None):
@@ -132,9 +133,7 @@ def cesm_time(ds):
     20–49 are removed.
 
     Args:
-        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with
-            valid ``units`` and ``calendar`` attributes compatible with
-            ``cftime.num2date``.
+        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.
 
     Returns:
         ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.

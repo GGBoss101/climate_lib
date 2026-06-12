@@ -33,14 +33,14 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 # Vertical integration functions
 #===============================
 def vert_integral(ds, var = None, g = 9.80665, pressure_factor = 100.0):
-    """Vertically integrate a DataArray in pressure coordinates.
+    """
+    Vertically integrate a DataArray in pressure coordinates.
 
     Args:
         ds (Dataset/DataArray): The input atmospheric data.
-        var (str, optional): The specific variable name to extract from ds.
+        var (str, optional): The specific variable name to extract from ``ds``.
         g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
-        pressure_factor (float): Multiplier to convert pressure units to Pascals
-        (default: 100.0 for hPa -> Pa).
+        pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
 
     Returns:
         integral (DataArray): Vertically integrated field (time, lat, lon).
@@ -70,17 +70,17 @@ def vert_integral(ds, var = None, g = 9.80665, pressure_factor = 100.0):
     return integral
 
 def vert_integral_optimized(da, var = None, g = 9.80665, pressure_factor = 100.0):
-    """Vertically integrate a DataArray using Xarray's native calculus.
+    """
+    Vertically integrate a DataArray using Xarray's native calculus.
 
     Args:
         da (Dataset/DataArray): The input atmospheric data.
-        var (str, optional): The specific variable name to extract from da.
+        var (str, optional): The specific variable name to extract from ``da``.
         g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
         pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
 
     Returns:
-        integral (DataArray): Pressure-coordinate vertical integral
-    with dimensions (time, lat, lon).
+        integral (DataArray): Pressure-coordinate vertical integral with dimensions (time, lat, lon).
     """
 
     # Select the specific variable if a Dataset was passed
@@ -141,10 +141,11 @@ def vert_integral_hybrid(ds, var, ds_hybrid, g = 9.80665):
     return total_int
 
 def div_uqvq_manual(ds, g = 9.81, Re = 6.371e6):
-    """Compute vertically integrated moisture flux divergence from CESM data.
+    """
+    Compute vertically integrated moisture flux divergence from CESM data.
 
     Args:
-        ds (Dataset): Input CESM dataset containing variables U, V, Q, PS, and hybrid coordinate coefficients.
+        ds (Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
         g (float): Gravitational acceleration in m/s^2 (default: 9.81).
         Re (float): Earth radius in meters (default: 6.371e6).
 
@@ -337,11 +338,11 @@ def dominguez_uqdiv(ds,
 
 def linear_trend(da):
     """
-    Compute linear regression statistics along the time dimension
+    Compute linear regression statistics along the ``time`` dimension
     of an Xarray DataArray.
 
     Args:
-        da (DataArray): Input data with a "time" dimension.
+        da (DataArray): Input data with a ``time`` dimension.
 
     Returns:
         slope (DataArray): Linear trend slope.
@@ -432,7 +433,8 @@ def ds_add_alb(ds):
     return ds
 
 def ds_add_rain(ds):
-    """Compute total precipitation and add it to the dataset.
+    """
+    Compute total precipitation and add it to the dataset.
 
     Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.
 
@@ -446,3 +448,39 @@ def ds_add_rain(ds):
     ds['rain'] = ds['PRECC'] + ds['PRECL'] + ds['PRECSC'] + ds['PRECSL']
 
     return ds
+
+def multi_apply_along_axis(func1d, axis, arrs, *args, **kwargs):
+    """
+    Apply a function to multiple arrays along a given axis.
+
+    Extends ``numpy.apply_along_axis`` to support functions that operate
+    on multiple 1D arrays simultaneously.
+
+    Args:
+        func1d (callable): Function that accepts one 1D slice from each array in ``arrs``.
+        axis (int): Axis along which to apply the function.
+        arrs (sequence of numpy.ndarray): Input arrays with compatible shapes for concatenation along ``axis``.
+        *args: Additional positional arguments passed to ``func1d``.
+        **kwargs: Additional keyword arguments passed to ``func1d``.
+
+    Returns:
+        numpy.ndarray: Result of applying ``func1d`` along the specified axis of the input arrays.
+    """
+    # Combine input arrays so they can be processed by apply_along_axis.
+    carrs = np.concatenate(arrs, axis)
+
+    # Record split locations needed to recover the original arrays.
+    offsets = []
+    start = 0
+    for i in range(len(arrs) - 1):
+        start += arrs[i].shape[axis]
+        offsets.append(start)
+
+    # Split each slice back into the original arrays before applying func1d.
+    def helperfunc(a, *args, **kwargs):
+        arrs = np.split(a, offsets)
+        return func1d(*[*arrs, *args], **kwargs)
+
+    # Apply the function along the requested axis.
+    return np.apply_along_axis(helperfunc, axis, carrs, *args, **kwargs)
+

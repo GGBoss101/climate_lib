@@ -30,7 +30,8 @@ warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
 
 def close_map(fig=None, ax=None):
-    """Fully closes a Matplotlib/Cartopy figure and clears memory. If ax and/or fig passed, it will clear both individually, otherwise, it will close all figures.
+    """
+    Fully closes a Matplotlib/Cartopy figure and clears memory. If ``ax`` and/or ``fig`` passed, it will clear both individually, otherwise, it will close all figures.
 
     Args:
         fig: matplotlib Figure object (preferred)
@@ -46,7 +47,8 @@ def close_map(fig=None, ax=None):
         plt.close("all")  # fallback: closes everything
 
 def NA_map(mapdata, cmap, clim, units="", title=""):
-    """Plot a North America map from a 2D Xarray DataArray.
+    """
+    Plot a North America map from a 2D Xarray DataArray.
 
     Args:
         mapdata (DataArray): 2D data with latitude and longitude coordinates. Expected dimensions are typically (lat, lon).
