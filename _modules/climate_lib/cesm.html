@@ -30,7 +30,7 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=d78e0131" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -352,6 +352,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 
 <div class="viewcode-block" id="modify_cesm">
@@ -443,9 +444,7 @@
 <span class="sd">    20–49 are removed.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with</span>
-<span class="sd">            valid ``units`` and ``calendar`` attributes compatible with</span>
-<span class="sd">            ``cftime.num2date``.</span>
+<span class="sd">        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.</span>
