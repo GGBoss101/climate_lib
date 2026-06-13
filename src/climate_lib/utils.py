@@ -23,11 +23,13 @@ from sklearn.linear_model import LinearRegression
 # import Ngl
 import geocat.comp
 
+from climate_lib.constants import *
+
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
 
-def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl):
+def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl, interpolate_method = 'linear'):
     """
     Vertically interpolate a variable from hybrid sigma-pressure coordinates to specified pressure levels.
 
@@ -52,7 +54,7 @@ def vertically_interpolate(varname, ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0p
                                     PS[i], hyam_ctrl[i], hybm_ctrl[i], p0=P0pa_ctrl[i],
                                     new_levels=pnew, 
                                     lev_dim='lev', 
-                                    method='linear', extrapolate=False, variable=None, t_bot=None, phi_sfc=None)
+                                    method=interpolate_method, extrapolate=False, variable=None, t_bot=None, phi_sfc=None)
     
     var_ctrl_out = xr.DataArray(data=var_ctrl_tmp, 
                           dims=['time','lev','lat','lon'], 

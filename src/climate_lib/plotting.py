@@ -24,6 +24,7 @@ from sklearn.linear_model import LinearRegression
 import geocat.comp
 
 from climate_lib.utils import *
+from climate_lib.constants import *
 
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
