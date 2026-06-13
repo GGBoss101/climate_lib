@@ -330,6 +330,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">geocat.comp</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
@@ -340,7 +341,7 @@
 <span class="c1">#===============================</span>
 <div class="viewcode-block" id="vert_integral">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.vert_integral">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="mf">9.80665</span><span class="p">,</span> <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g_earth</span><span class="p">,</span> <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Vertically integrate a DataArray in pressure coordinates.</span>
 
@@ -356,9 +357,14 @@
 
     <span class="c1"># Select the specific variable if a variable was passed</span>
     <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; not found in the dataset.&quot;</span><span class="p">)</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">ds</span>
+
+    <span class="k">if</span> <span class="s2">&quot;ilev&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Variable must have &#39;ilev&#39; (interface levels) dimension for vertical integration.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Calculate layer thicknesses from interface levels (ilev)</span>
     <span class="n">interface_diffs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">ilev</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;ilev&quot;</span><span class="p">)</span>
@@ -378,15 +384,15 @@
     <span class="k">return</span> <span class="n">integral</span></div>
 
 
-<div class="viewcode-block" id="vert_integral_optimized">
-<a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.vert_integral_optimized">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral_optimized</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="mf">9.80665</span><span class="p">,</span> <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">):</span>
+<div class="viewcode-block" id="vert_integral_native">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.vert_integral_native">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral_native</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">var</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g_earth</span><span class="p">,</span> <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Vertically integrate a DataArray using Xarray&#39;s native calculus.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        da (Dataset/DataArray): The input atmospheric data.</span>
-<span class="sd">        var (str, optional): The specific variable name to extract from ``da``.</span>
+<span class="sd">        var (str): The specific variable name to extract from ``da`` (optional).</span>
 <span class="sd">        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).</span>
 <span class="sd">        pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -&gt; Pa).</span>
 
@@ -396,8 +402,14 @@
 
     <span class="c1"># Select the specific variable if a Dataset was passed</span>
     <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; not found in the dataset.&quot;</span><span class="p">)</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
 
+    <span class="c1"># Validation Checks</span>
+    <span class="k">if</span> <span class="s2">&quot;lev&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Variable must have &#39;lev&#39; (level) dimension for vertical integration.&quot;</span><span class="p">)</span>
+    
     <span class="c1"># Scale the vertical coordinate values to Pascals (e.g., hPa -&gt; Pa)</span>
     <span class="n">da_scaled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">lev</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">lev</span> <span class="o">*</span> <span class="n">pressure_factor</span><span class="p">)</span>
 
@@ -412,7 +424,7 @@
 
 <div class="viewcode-block" id="vert_integral_hybrid">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.vert_integral_hybrid">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral_hybrid</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">ds_hybrid</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="mf">9.80665</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vert_integral_hybrid</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">ds_hybrid</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g_earth</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Vertically integrate a variable across hybrid sigma-pressure coordinates.</span>
 
 <span class="sd">    Args:</span>
@@ -428,6 +440,12 @@
     <span class="c1"># Dynamically read reference surface pressure safely</span>
     <span class="c1"># Falls back to 100000.0 Pa if P0 is missing from the dataset attributes/variables</span>
     <span class="n">P0</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;P0&quot;</span><span class="p">,</span> <span class="n">ds_hybrid</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;P0&quot;</span><span class="p">,</span> <span class="mf">100000.0</span><span class="p">))</span>
+
+    <span class="c1"># Validation checks</span>
+    <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; not found in the dataset.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">ds_hybrid</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;PS&quot;</span><span class="p">,</span> <span class="s2">&quot;hyai&quot;</span><span class="p">,</span> <span class="s2">&quot;hybi&quot;</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Hybrid dataset must contain &#39;PS&#39;, &#39;hyai&#39;, and &#39;hybi&#39; variables.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Extract necessary variables</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
@@ -457,21 +475,28 @@
 
 <div class="viewcode-block" id="div_uqvq_manual">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.div_uqvq_manual">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">div_uqvq_manual</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span><span class="p">,</span> <span class="n">Re</span> <span class="o">=</span> <span class="mf">6.371e6</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">div_uqvq_manual</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">g_earth</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">R_earth</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute vertically integrated moisture flux divergence from CESM data.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ds (Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.</span>
 <span class="sd">        g (float): Gravitational acceleration in m/s^2 (default: 9.81).</span>
-<span class="sd">        Re (float): Earth radius in meters (default: 6.371e6).</span>
+<span class="sd">        R (float): Planet radius in meters (default: Earth Radius = 6.371e6).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        qdiv (DataArray): Vertically integrated moisture divergence (kg m-2 s-1).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Validation checks</span>
+    <span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PS&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;hyai&quot;</span><span class="p">,</span> <span class="s2">&quot;hybi&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">required_vars</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; for this calculation.&quot;</span><span class="p">)</span>
+        
 
     <span class="n">hyai</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">hyai</span>
     <span class="n">hybi</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">hybi</span>
+    
     <span class="c1"># Default to 100000 Pa if P0 is missing from the dataset</span>
     <span class="n">P0</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;P0&quot;</span><span class="p">,</span> <span class="mf">100000.0</span><span class="p">)</span>
 
@@ -511,11 +536,11 @@
     <span class="n">du_dx</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">uq_int</span> <span class="o">*</span> <span class="n">coslat</span><span class="p">)</span><span class="o">.</span><span class="n">differentiate</span><span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">)</span>
         <span class="o">*</span> <span class="n">deg_per_rad</span>
-        <span class="o">/</span> <span class="p">(</span><span class="n">Re</span> <span class="o">*</span> <span class="n">coslat</span><span class="p">)</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">R</span> <span class="o">*</span> <span class="n">coslat</span><span class="p">)</span>
     <span class="p">)</span>
 
     <span class="c1"># Latitudinal gradient component</span>
-    <span class="n">dv_dy</span> <span class="o">=</span> <span class="n">vq_int</span><span class="o">.</span><span class="n">differentiate</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_rad</span> <span class="o">/</span> <span class="n">Re</span>
+    <span class="n">dv_dy</span> <span class="o">=</span> <span class="n">vq_int</span><span class="o">.</span><span class="n">differentiate</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">deg_per_rad</span> <span class="o">/</span> <span class="n">R</span>
 
     <span class="c1"># Combined horizontal moisture divergence</span>
     <span class="n">qdiv</span> <span class="o">=</span> <span class="n">du_dx</span> <span class="o">+</span> <span class="n">dv_dy</span>
@@ -538,23 +563,33 @@
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.dominguez_uqdiv">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dominguez_uqdiv</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span>
     <span class="n">dPmb</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="mf">9.81</span><span class="p">,</span>
-    <span class="n">R</span> <span class="o">=</span> <span class="mf">6.37122e6</span><span class="p">,</span>
-    <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,):</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">g_earth</span><span class="p">,</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">R_earth</span><span class="p">,</span>
+    <span class="n">pressure_factor</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span>
+    <span class="n">interpolate_method</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute vertically integrated moisture flux divergence</span>
 <span class="sd">    using pressure-level interpolation.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ds (Dataset): CESM atmospheric dataset</span>
+<span class="sd">        ds (xarray.Dataset): CESM atmospheric dataset</span>
 <span class="sd">        dPmb (float): Pressure spacing in hPa (default 25)</span>
 <span class="sd">        g (float): Gravity (m/s²) (default 9.81)</span>
 <span class="sd">        R (float): Planet radius (m) (default 6.37122e6 = Earth radius)</span>
 <span class="sd">        pressure_factor (float): Factor to convert pressure levels to Pascals (default 100.0)</span>
+<span class="sd">        interpolate_method (str): Method for vertical interpolation (&#39;linear&#39; or &#39;log&#39;, default &#39;linear&#39;)</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        qdiv (DataArray): Moisture flux divergence (mm/day)</span>
+<span class="sd">        ctrl_q_div (dict(str: xarray.Dataset)): Moisture flux divergence (mm/day) and its components (kg m-1 s-1) in a Dataset.</span>
+<span class="sd">            - &#39;VIMF_x&#39;: Vertically integrated moisture flux x-component (kg m-1 s-1)</span>
+<span class="sd">            - &#39;VIMF_y&#39;: Vertically integrated moisture flux y-component (kg m-1 s-1)</span>
+<span class="sd">            - &#39;q_div&#39;: Vertically integrated moisture flux divergence (mm/day)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Validation checks</span>
+    <span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;PS&#39;</span><span class="p">,</span> <span class="s1">&#39;hyam&#39;</span><span class="p">,</span> <span class="s1">&#39;hybm&#39;</span><span class="p">,</span> <span class="s1">&#39;P0&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">required_vars</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; for this calculation.&quot;</span><span class="p">)</span>
     <span class="n">ds_ctrl</span> <span class="o">=</span> <span class="n">ds</span>
     <span class="c1"># Calculate moisture flux divergence (qv vi -&gt; q_div -&gt; diff -&gt; tavg)</span>
 
@@ -566,7 +601,7 @@
 
     <span class="n">PS</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PS</span> <span class="c1"># (time, lat, lon)</span>
 
-    <span class="c1"># constants</span>
+    <span class="c1"># Constants</span>
     <span class="n">lat</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">lat</span>
     <span class="n">lon</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">lon</span>
 
@@ -580,25 +615,21 @@
     <span class="n">dP</span> <span class="o">=</span> <span class="n">dPmb</span> <span class="o">*</span> <span class="n">pressure_factor</span>
     <span class="n">pnew</span> <span class="o">=</span> <span class="n">pnew</span> <span class="o">*</span> <span class="n">pressure_factor</span>
 
-    <span class="c1"># Do the interpolation.</span>
-    <span class="n">intyp</span> <span class="o">=</span> <span class="mi">1</span>                              <span class="c1"># 1=linear, 2=log, 3=log-log</span>
-    <span class="n">kxtrp</span> <span class="o">=</span> <span class="kc">False</span>                          <span class="c1"># True=extrapolate (when the output pressure level is outside of the range of psrf)</span>
-
     <span class="c1"># Extract the desired variables</span>
     <span class="n">hyam_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">hyam</span>  <span class="c1"># (time:30, lev:30)</span>
     <span class="n">hybm_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">hybm</span>  <span class="c1"># (time:30, lev:30)</span>
     <span class="n">psrf_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">PS</span>  <span class="c1"># (time:30, lat:192, lon:288)</span>
     <span class="n">P0pa_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">P0</span>  <span class="c1"># (time:30)</span>
 
-    <span class="n">U_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">)</span>
-    <span class="n">V_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">)</span>
-    <span class="n">Q_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">)</span>
+    <span class="n">U_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span><span class="p">)</span>
+    <span class="n">V_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span><span class="p">)</span>
+    <span class="n">Q_ctrl</span> <span class="o">=</span> <span class="n">vertically_interpolate</span><span class="p">(</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span><span class="p">)</span>
 
     <span class="n">ctrl_plev</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">({</span><span class="s1">&#39;U&#39;</span><span class="p">:</span> <span class="n">U_ctrl</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">V_ctrl</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span> <span class="n">Q_ctrl</span><span class="p">})</span>
 
     
     
-    <span class="c1"># vertically integrated qv</span>
+    <span class="c1"># Vertically integrated qv</span>
     <span class="n">VIMF_ctrl_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">U_ctrl</span> <span class="o">*</span> <span class="n">Q_ctrl</span> <span class="o">*</span> <span class="n">dP</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">g</span>
     <span class="n">VIMF_ctrl_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">V_ctrl</span> <span class="o">*</span> <span class="n">Q_ctrl</span> <span class="o">*</span> <span class="n">dP</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">g</span>
 
@@ -610,10 +641,8 @@
     <span class="n">dlat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)</span>
     <span class="n">dlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">lon_rad</span><span class="p">)</span>
 
-    <span class="c1"># cosphi = np.cos(lat_rad)</span>
     <span class="n">cosphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_rad</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 
-    <span class="c1"># q_div</span>
     <span class="n">Z_ctrl_tmp</span> <span class="o">=</span> <span class="n">VIMF_ctrl_x</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
     
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">VIMF_ctrl_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -650,7 +679,7 @@
 
     <span class="n">ctrl_q_div</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">({</span><span class="s1">&#39;VIMF_x&#39;</span><span class="p">:</span> <span class="n">VIMF_ctrl_x_da</span><span class="p">,</span> <span class="s1">&#39;VIMF_y&#39;</span><span class="p">:</span> <span class="n">VIMF_ctrl_y_da</span><span class="p">,</span> <span class="s1">&#39;q_div&#39;</span><span class="p">:</span> <span class="n">q_div_ctrl_da</span><span class="p">})</span>
 
-    <span class="k">return</span> <span class="n">q_div_ctrl_da</span></div>
+    <span class="k">return</span> <span class="n">ctrl_q_div</span></div>
 
 
 <span class="c1">#============================</span>
@@ -816,6 +845,84 @@
     <span class="c1"># Apply the function along the requested axis.</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">helperfunc</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">carrs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="means">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.means">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">means</span><span class="p">(</span><span class="n">ds_case</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the global, ocean and land mean of a given variable for a given configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ds_case (xarray): dictionnary containing lat and lon dimensions.</span>
+<span class="sd">        mask (list): representation of continental distribution, with value 1 if land and value 0 if ocean.</span>
+<span class="sd">        var (str): name of the variable that needs to be averaged.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gm (float OR array): global mean (can be an array if ds_case contains others dimensions).</span>
+<span class="sd">        lm (float OR array): land mean (can be an array if ds_case contains others dimensions).</span>
+<span class="sd">        om (float OR array): ocean mean (can be an array if ds_case contains others dimensions).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Collects the datas to plot the surface temperature</span>
+    <span class="n">mapdata</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds_case</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Weights the latitude, renames it to &quot;weights&quot;, then prints the value</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">ds_case</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">lat</span><span class="p">))</span>
+    <span class="n">weights</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;weights&quot;</span>
+
+    <span class="c1"># Finds the weighted global mean based on latitude and longitude</span>
+    <span class="n">gm</span> <span class="o">=</span> <span class="n">mapdata</span><span class="o">.</span><span class="n">weighted</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Defines a land timeseries where the land mask is present</span>
+    <span class="n">land</span> <span class="o">=</span> <span class="n">mapdata</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Defines an ocean timeseries where the land mask is not present (i.e. just ocean/water)</span>
+    <span class="n">ocean</span> <span class="o">=</span> <span class="n">mapdata</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Mean Land</span>
+    <span class="n">lm</span> <span class="o">=</span> <span class="n">land</span><span class="o">.</span><span class="n">weighted</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Mean Ocean</span>
+    <span class="n">om</span> <span class="o">=</span> <span class="n">ocean</span><span class="o">.</span><span class="n">weighted</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">return</span> <span class="n">gm</span><span class="p">,</span> <span class="n">lm</span><span class="p">,</span> <span class="n">om</span></div>
+
+
+<div class="viewcode-block" id="inferred_heat_transport">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.compute.inferred_heat_transport">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">inferred_heat_transport</span><span class="p">(</span><span class="n">energy_in</span><span class="p">,</span> <span class="n">lat_deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute inferred northward heat transport from energy imbalance.</span>
+
+<span class="sd">    Integrates the zonal-mean net energy imbalance from the South Pole</span>
+<span class="sd">    toward the North Pole and converts the result to petawatts (PW).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        energy_in (xarray.DataArray): Zonal-mean net energy flux entering</span>
+<span class="sd">            the atmosphere (W m^-2).</span>
+<span class="sd">        lat_deg (xarray.DataArray): Latitude coordinates in degrees.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        energy_out (xarray.DataArray): Northward heat transport in petawatts (PW).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert latitude from degrees to radians for integration.</span>
+    <span class="n">lat_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">)</span>
+
+    <span class="c1"># Weight the energy imbalance by cos(latitude) to account for</span>
+    <span class="c1"># the decreasing area of latitude bands toward the poles.</span>
+    <span class="n">flux_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">energy_in</span>
+
+    <span class="c1"># Integrate cumulatively from south to north using the</span>
+    <span class="c1"># trapezoidal rule.</span>
+    <span class="n">transport</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">cumulative_trapezoid</span><span class="p">(</span>
+        <span class="n">flux_density</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">lat_rad</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert from W to PW and scale by Earth&#39;s surface geometry.</span>
+    <span class="n">energy_out</span> <span class="o">=</span> <span class="mf">1e-15</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">R_earth</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">transport</span>
+    <span class="k">return</span> <span class="n">energy_out</span></div>
 
 </pre></div>
 

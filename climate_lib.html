@@ -383,14 +383,14 @@ of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_me
 <p>This module contains functions for computing various atmospheric diagnostics.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.compute.div_uqvq_manual">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">div_uqvq_manual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.81</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Re</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6371000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#div_uqvq_manual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.div_uqvq_manual" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">div_uqvq_manual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.80665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6371000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#div_uqvq_manual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.div_uqvq_manual" title="Link to this definition">#</a></dt>
 <dd><p>Compute vertically integrated moisture flux divergence from CESM data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<em>Dataset</em>) – Input CESM dataset containing variables <code class="docutils literal notranslate"><span class="pre">U</span></code>, <code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PS</span></code>, and hybrid coordinate coefficients.</p></li>
 <li><p><strong>g</strong> (<em>float</em>) – Gravitational acceleration in m/s^2 (default: 9.81).</p></li>
-<li><p><strong>Re</strong> (<em>float</em>) – Earth radius in meters (default: 6.371e6).</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – Planet radius in meters (default: Earth Radius = 6.371e6).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -401,21 +401,25 @@ of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_me
 
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.compute.dominguez_uqdiv">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">dominguez_uqdiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dPmb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.81</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6371220.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#dominguez_uqdiv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.dominguez_uqdiv" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">dominguez_uqdiv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dPmb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.80665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6371000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#dominguez_uqdiv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.dominguez_uqdiv" title="Link to this definition">#</a></dt>
 <dd><p>Compute vertically integrated moisture flux divergence
 using pressure-level interpolation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>Dataset</em>) – CESM atmospheric dataset</p></li>
+<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – CESM atmospheric dataset</p></li>
 <li><p><strong>dPmb</strong> (<em>float</em>) – Pressure spacing in hPa (default 25)</p></li>
 <li><p><strong>g</strong> (<em>float</em>) – Gravity (m/s²) (default 9.81)</p></li>
 <li><p><strong>R</strong> (<em>float</em>) – Planet radius (m) (default 6.37122e6 = Earth radius)</p></li>
 <li><p><strong>pressure_factor</strong> (<em>float</em>) – Factor to convert pressure levels to Pascals (default 100.0)</p></li>
+<li><p><strong>interpolate_method</strong> (<em>str</em>) – Method for vertical interpolation (‘linear’ or ‘log’, default ‘linear’)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>qdiv</strong> (<em>DataArray</em>) – Moisture flux divergence (mm/day)</p>
+<dd class="field-even"><p><strong>ctrl_q_div (dict(str</strong> – xarray.Dataset)): Moisture flux divergence (mm/day) and its components (kg m-1 s-1) in a Dataset.
+- ‘VIMF_x’: Vertically integrated moisture flux x-component (kg m-1 s-1)
+- ‘VIMF_y’: Vertically integrated moisture flux y-component (kg m-1 s-1)
+- ‘q_div’: Vertically integrated moisture flux divergence (mm/day)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -459,6 +463,26 @@ stores the results as new variables in the dataset.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="climate_lib.compute.inferred_heat_transport">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">inferred_heat_transport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_deg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#inferred_heat_transport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.inferred_heat_transport" title="Link to this definition">#</a></dt>
+<dd><p>Compute inferred northward heat transport from energy imbalance.</p>
+<p>Integrates the zonal-mean net energy imbalance from the South Pole
+toward the North Pole and converts the result to petawatts (PW).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>energy_in</strong> (<em>xarray.DataArray</em>) – Zonal-mean net energy flux entering
+the atmosphere (W m^-2).</p></li>
+<li><p><strong>lat_deg</strong> (<em>xarray.DataArray</em>) – Latitude coordinates in degrees.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>energy_out</strong> (<em>xarray.DataArray</em>) – Northward heat transport in petawatts (PW).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.compute.linear_trend">
 <span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">linear_trend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#linear_trend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.linear_trend" title="Link to this definition">#</a></dt>
 <dd><p>Compute linear regression statistics along the <code class="docutils literal notranslate"><span class="pre">time</span></code> dimension
@@ -474,6 +498,28 @@ of an Xarray DataArray.</p>
 <li><p><strong>rvalue</strong> (<em>DataArray</em>) – Correlation coefficient.</p></li>
 <li><p><strong>pvalue</strong> (<em>DataArray</em>) – Statistical p-value.</p></li>
 <li><p><strong>stderr</strong> (<em>DataArray</em>) – Standard error of the slope.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="climate_lib.compute.means">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">means</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_case</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#means"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.means" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the global, ocean and land mean of a given variable for a given configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds_case</strong> (<em>xarray</em>) – dictionnary containing lat and lon dimensions.</p></li>
+<li><p><strong>mask</strong> (<em>list</em>) – representation of continental distribution, with value 1 if land and value 0 if ocean.</p></li>
+<li><p><strong>var</strong> (<em>str</em>) – name of the variable that needs to be averaged.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>gm</strong> (<em>float OR array</em>) – global mean (can be an array if ds_case contains others dimensions).</p></li>
+<li><p><strong>lm</strong> (<em>float OR array</em>) – land mean (can be an array if ds_case contains others dimensions).</p></li>
+<li><p><strong>om</strong> (<em>float OR array</em>) – ocean mean (can be an array if ds_case contains others dimensions).</p></li>
 </ul>
 </dd>
 </dl>
@@ -540,14 +586,14 @@ on multiple 1D arrays simultaneously.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="climate_lib.compute.vert_integral_optimized">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">vert_integral_optimized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.80665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#vert_integral_optimized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.vert_integral_optimized" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="climate_lib.compute.vert_integral_native">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">vert_integral_native</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.80665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressure_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#vert_integral_native"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.vert_integral_native" title="Link to this definition">#</a></dt>
 <dd><p>Vertically integrate a DataArray using Xarray’s native calculus.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>da</strong> (<em>Dataset/DataArray</em>) – The input atmospheric data.</p></li>
-<li><p><strong>var</strong> (<em>str</em><em>, </em><em>optional</em>) – The specific variable name to extract from <code class="docutils literal notranslate"><span class="pre">da</span></code>.</p></li>
+<li><p><strong>var</strong> (<em>str</em>) – The specific variable name to extract from <code class="docutils literal notranslate"><span class="pre">da</span></code> (optional).</p></li>
 <li><p><strong>g</strong> (<em>float</em>) – Gravity acceleration constant in m/s^2 (default: 9.80665).</p></li>
 <li><p><strong>pressure_factor</strong> (<em>float</em>) – Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -&gt; Pa).</p></li>
 </ul>
@@ -659,7 +705,7 @@ on multiple 1D arrays simultaneously.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.utils.vertically_interpolate">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.utils.</span></span><span class="sig-name descname"><span class="pre">vertically_interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyam_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hybm_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0pa_ctrl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/utils.html#vertically_interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.utils.vertically_interpolate" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">climate_lib.utils.</span></span><span class="sig-name descname"><span class="pre">vertically_interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pnew</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyam_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hybm_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P0pa_ctrl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/utils.html#vertically_interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.utils.vertically_interpolate" title="Link to this definition">#</a></dt>
 <dd><p>Vertically interpolate a variable from hybrid sigma-pressure coordinates to specified pressure levels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -731,11 +777,13 @@ on multiple 1D arrays simultaneously.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.dominguez_uqdiv"><code class="docutils literal notranslate"><span class="pre">dominguez_uqdiv()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.ds_add_alb"><code class="docutils literal notranslate"><span class="pre">ds_add_alb()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.ds_add_rain"><code class="docutils literal notranslate"><span class="pre">ds_add_rain()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.inferred_heat_transport"><code class="docutils literal notranslate"><span class="pre">inferred_heat_transport()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.linear_trend"><code class="docutils literal notranslate"><span class="pre">linear_trend()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.means"><code class="docutils literal notranslate"><span class="pre">means()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.multi_apply_along_axis"><code class="docutils literal notranslate"><span class="pre">multi_apply_along_axis()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.vert_integral"><code class="docutils literal notranslate"><span class="pre">vert_integral()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.vert_integral_hybrid"><code class="docutils literal notranslate"><span class="pre">vert_integral_hybrid()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.vert_integral_optimized"><code class="docutils literal notranslate"><span class="pre">vert_integral_optimized()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.vert_integral_native"><code class="docutils literal notranslate"><span class="pre">vert_integral_native()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-climate_lib.constants">climate_lib.constants module</a><ul class="nav section-nav flex-column">
