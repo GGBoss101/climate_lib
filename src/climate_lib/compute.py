@@ -33,142 +33,154 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 #===============================
 # Vertical integration functions
 #===============================
-def vert_integral(ds, var = None, g = g_earth, pressure_factor = 100.0):
-    """
-    Vertically integrate a DataArray in pressure coordinates.
 
-    Args:
-        ds (Dataset/DataArray): The input atmospheric data.
-        var (str, optional): The specific variable name to extract from ``ds``.
-        g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
-        pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
-
-    Returns:
-        integral (DataArray): Vertically integrated field (time, lat, lon).
-    """
-
-    # Select the specific variable if a variable was passed
-    if var is not None:
-        if var not in ds:
-            raise ValueError(f"Variable '{var}' not found in the dataset.")
-        da = ds[var]
-    else:
-        da = ds
-
-    if "ilev" not in da.dims:
-        raise ValueError("Variable must have 'ilev' (interface levels) dimension for vertical integration.")
-
-    # Calculate layer thicknesses from interface levels (ilev)
-    interface_diffs = ds.ilev.diff(dim="ilev")
-
-    # Convert to a DataArray for thickness using the mid-level (lev) coordinates
-    dp = interface_diffs.rename({"ilev": "lev"}).assign_coords(lev=da.lev)
-
-    # Scale the thicknesses to Pascals (e.g., hPa -> Pa)
-    dp = dp * pressure_factor
-
-    # Multiply the data by the layer thickness
-    weighted_data = da * dp
-
-    # Sum along the vertical axis and divide by gravity
-    integral = weighted_data.sum(dim = "lev") / g
-
-    return integral
 
 def vert_integral_native(da, var = None, g = g_earth, pressure_factor = 100.0):
-    """
-    Vertically integrate a DataArray using Xarray's native calculus.
+    """Vertically integrate a Dataset using Xarray's native calculus.
 
     Args:
-        da (Dataset/DataArray): The input atmospheric data.
+        da (xarray.Dataset): The input atmospheric data.
         var (str): The specific variable name to extract from ``da`` (optional).
         g (float): Gravity acceleration constant in m/s^2 (default: 9.80665).
         pressure_factor (float): Multiplier to convert pressure units to Pascals (default: 100.0 for hPa -> Pa).
 
     Returns:
-        integral (DataArray): Pressure-coordinate vertical integral with dimensions (time, lat, lon).
+        integral (xarray.Dataset): Pressure-coordinate vertical integral with dimensions (time, lat, lon).
     """
-
-    # Select the specific variable if a Dataset was passed
     if var is not None:
         if var not in da:
             raise ValueError(f"Variable '{var}' not found in the dataset.")
         da = da[var]
 
-    # Validation Checks
     if "lev" not in da.dims:
-        raise ValueError("Variable must have 'lev' (level) dimension for vertical integration.")
-    
+        raise ValueError(
+            "Variable must have 'lev' (level) dimension for vertical"
+            " integration."
+        )
+
     # Scale the vertical coordinate values to Pascals (e.g., hPa -> Pa)
-    da_scaled = da.assign_coords(lev = da.lev * pressure_factor)
+    da_scaled = da.assign_coords(lev=da.lev * pressure_factor)
 
     # Perform the mathematical integration along the vertical axis
-    raw_integral = da_scaled.integrate(dim = "lev")
+    raw_integral = da_scaled.integrate(dim="lev")
 
     # Divide the column by gravity to get mass-weighted units
     integral = raw_integral / g
 
     return integral
 
-def vert_integral_hybrid(ds, var, ds_hybrid, g = g_earth):
-    """Vertically integrate a variable across hybrid sigma-pressure coordinates.
+
+def vert_integral(ds, var = None, g = g_earth, pressure_factor = 100.0):
+    """Vertically integrate a variable in pressure coordinates.
 
     Args:
-        ds (Dataset): Input dataset containing the variable to integrate.
-        var (str): String name of the variable to extract (e.g., 'Q').
-        ds_hybrid (Dataset/DataArray): Source dataset for the hybrid coefficients.
-        g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
+        ds (xarray.Dataset): Input dataset containing the variable and pressure interface coordinates.
+        var (str): Variable name to vertically integrate.
+        g (float): Gravitational acceleration (m s^-2).
+        pressure_factor (float): Factor used to convert pressure units to Pascals (e.g., 100.0 for hPa → Pa).
 
     Returns:
-        total_int (DataArray): Vertically integrated result (e.g., kg/m² for Q).
+        integral (xarray.DataArray): Vertically integrated field.
+    """
+    if var is None:
+        raise ValueError("A variable name must be provided.")
+
+    if var not in ds:
+        raise ValueError(f"Variable '{var}' not found in dataset.")
+
+    da = ds[var]
+
+    if "lev" not in da.dims:
+        raise ValueError(f"Variable '{var}' must contain a 'lev' dimension.")
+
+    if "ilev" not in ds.coords:
+        raise ValueError("Dataset must contain 'ilev' interface coordinates.")
+
+    # Compute layer pressure thicknesses cleanly without stale metadata
+    dp = ds["ilev"].diff(dim="ilev").drop_vars("ilev").rename({"ilev": "lev"})
+    dp = dp.assign_coords({"lev": da.lev}) * pressure_factor
+
+    # Handle vertical grid orientation safely
+    dp = abs(dp)
+
+    # Compute mass-weighted vertical integral.
+    integral = (da * dp).sum(dim="lev") / g
+
+    return integral
+
+
+def vert_int_hybrid(ds, var, ds_hybrid, g = g_earth, P0 = P0pa):
+    """Computes the vertical integration of a variable on hybrid coordinates.
+
+    This function calculates the mass-weighted column integration of an atmospheric variable (such as specific humidity to get total column water vapor) using hybrid sigma-pressure coordinate coefficients.
+
+    Args:
+        ds (xarray.Dataset): Input dataset containing the target variable.
+        var (str): Name of the variable inside `ds` to vertically integrate.
+        ds_hybrid (xarray.Dataset): Dataset containing the surface pressure ('PS') and the hybrid interface coefficients ('hyai', 'hybi').
+        g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
+        P0 (float): Reference pressure in Pascals for the hybrid coordinate system (default: 100000.0 Pa).
+
+    Returns:
+        total_int (xarray.DataArray): The vertically integrated field with the vertical dimension ('lev') integrated out absolutely.
     """
 
-    # Dynamically read reference surface pressure safely
-    # Falls back to 100000.0 Pa if P0 is missing from the dataset attributes/variables
-    P0 = ds.get("P0", ds_hybrid.get("P0", 100000.0))
-
     # Validation checks
+    if var is None:
+        raise ValueError("A variable name must be provided for vertical integration.")
     if var not in ds:
-        raise ValueError(f"Variable '{var}' not found in the dataset.")
-    if not all(x in ds_hybrid for x in ["PS", "hyai", "hybi"]):
-        raise ValueError("Hybrid dataset must contain 'PS', 'hyai', and 'hybi' variables.")
+        raise ValueError(f"Variable '{var}' not found in the input dataset.")
 
-    # Extract necessary variables
+    # Extract necessary variables and coefficients
     q = ds[var]
-    PS = ds_hybrid.PS
-    hyai = ds_hybrid.hyai
-    hybi = ds_hybrid.hybi
+    PS = ds_hybrid["PS"]
+    hyai = ds_hybrid["hyai"]
+    hybi = ds_hybrid["hybi"]
 
-    # Compute interface pressures (in Pa)
-    # CESM formula: P_interfaces = A(k)*P0 + B(k)*PS
+    # Compute interface pressures (Pa) for every grid point and level
+    # Formula: P_interfaces = A(k)*P0 + B(k)*PS
     P_i = hyai * P0 + hybi * PS
 
-    # Compute pressure thickness (dp) natively using .diff()
-    # .data preserves underlying Dask chunks and strips indexing mismatched names
-    dp_raw = P_i.diff(dim = "ilev").data
+    # Compute the pressure thickness (dp) of each layer by differencing the interfaces
+    # Formula: dp = P_i(k+1) - P_i(k)
+    dp = P_i.diff(dim="ilev")
 
-    # Build dp directly using the target data's dimensions and coordinates
-    # This replaces the slow .copy() and .values assignment entirely
-    dp = xr.DataArray(dp_raw, dims = q.dims, coords = q.coords)
+    # Adapt coordinates from interfaces ('ilev') to layer centers ('lev')
+    # Dropping 'ilev' variables avoids dimension conflicts during alignment
+    dp = dp.drop_vars("ilev").rename({"ilev": "lev"})
+    dp = dp.assign_coords({"lev": q.coords["lev"]})
 
-    # Compute mass-weighted column layer values and sum over vertical axis
-    # Xarray handles broadcasting automatically; no manual transposing needed
+    # Handle vertical grid orientation safely
+    # If dp is negative (levels ordered surface to top), convert to absolute thickness
+    dp = abs(dp)
+
+    # Compute column integration using hydrostatic balance
+    # Formula: (q * dp) / g
     layer_int = (q * dp) / g
-    total_int = layer_int.sum(dim = "lev", skipna = True)
+
+    # Vertically integrate over the level dimension
+    total_int = layer_int.sum(dim="lev", skipna=True)
 
     return total_int
+
+
+
+#=====================
+# Divergence functions
+#=====================
+
 
 def div_uqvq_manual(ds, g = g_earth, R = R_earth):
     """
     Compute vertically integrated moisture flux divergence from CESM data.
 
     Args:
-        ds (Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
+        ds (xarray.Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
         g (float): Gravitational acceleration in m/s^2 (default: 9.81).
         R (float): Planet radius in meters (default: Earth Radius = 6.371e6).
 
     Returns:
-        qdiv (DataArray): Vertically integrated moisture divergence (kg m-2 s-1).
+        qdiv (xarray.Dataset): Vertically integrated moisture divergence (kg m-2 s-1).
     """
     # Validation checks
     required_vars = ["PS", "U", "V", "Q", "hyai", "hybi"]
@@ -179,7 +191,7 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
 
     hyai = ds.hyai
     hybi = ds.hybi
-    
+
     # Default to 100000 Pa if P0 is missing from the dataset
     P0 = ds.get("P0", 100000.0)
 
@@ -197,7 +209,7 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
     # Compute pressure thickness Δp between interfaces
     dp_raw = p_int.diff(dim="ilev")
     
-    # Swap the coordinate dimension name from 'ilev' to 'lev' 
+    # Swap the coordinate dimension name from 'ilev' to 'lev'
     dp = dp_raw.rename({"ilev": "lev"}).assign_coords(lev=ds.lev)
 
     # Moisture fluxes and vertical integration
@@ -236,10 +248,6 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
     }
 
     return qdiv
-
-#=====================
-# Divergence functions
-#=====================
 
 def dominguez_uqdiv(ds,
     dPmb = 25,
@@ -342,17 +350,17 @@ def dominguez_uqdiv(ds,
     var_ctrl = ds_ctrl[varname]  # (time:30, lev:30, lat:192, lon:288)
 
 
-    VIMF_ctrl_x_da = xr.DataArray(data=VIMF_ctrl_x, 
+    VIMF_ctrl_x_da = xr.Dataset(data=VIMF_ctrl_x, 
                                 dims=['time','lat','lon'], 
                                 coords={'time':var_ctrl['time'], 'lat':var_ctrl['lat'], 'lon':var_ctrl['lon']}, 
                                 attrs={'long_name': 'Vertically integrated moisture flux x-component', 'units': 'kg m-1 s-1'})
     
-    VIMF_ctrl_y_da = xr.DataArray(data=VIMF_ctrl_y, 
+    VIMF_ctrl_y_da = xr.Dataset(data=VIMF_ctrl_y, 
                                 dims=['time','lat','lon'], 
                                 coords={'time':var_ctrl['time'], 'lat':var_ctrl['lat'], 'lon':var_ctrl['lon']}, 
                                 attrs={'long_name': 'Vertically integrated moisture flux y-component', 'units': 'kg m-1 s-1'})
 
-    q_div_ctrl_da = xr.DataArray(data=Z_ctrl_tmp, 
+    q_div_ctrl_da = xr.Dataset(data=Z_ctrl_tmp, 
                                 dims=['time','lat','lon'], 
                                 coords={'time':var_ctrl['time'], 'lat':var_ctrl['lat'], 'lon':var_ctrl['lon']}, 
                                 attrs={'long_name': 'Vertically integrated moisture flux divergence', 'units': 'mm/day'})
@@ -368,18 +376,23 @@ def dominguez_uqdiv(ds,
 def linear_trend(da):
     """
     Compute linear regression statistics along the ``time`` dimension
-    of an Xarray DataArray.
+    of an Xarray Dataset.
 
     Args:
-        da (DataArray): Input data with a ``time`` dimension.
+        da (xarray.Dataset): Input data with a ``time`` dimension.
 
     Returns:
-        slope (DataArray): Linear trend slope.
-        intercept (DataArray): Regression intercept.
-        rvalue (DataArray): Correlation coefficient.
-        pvalue (DataArray): Statistical p-value.
-        stderr (DataArray): Standard error of the slope.
+        tuple:
+            - slope (xarray.Dataset): Linear trend slope.
+            - intercept (xarray.Dataset): Regression intercept.
+            - rvalue (xarray.Dataset): Correlation coefficient.
+            - pvalue (xarray.Dataset): Statistical p-value.
+            - stderr (xarray.Dataset): Standard error of the slope.
     """
+
+    # Validation checks
+    if "time" not in da.dims:
+        raise ValueError("Input Dataset must have a 'time' dimension for linear regression.")
 
     # Create numerical time coordinates for regression
     time_coords = np.arange(len(da["time"]))
@@ -447,6 +460,12 @@ def ds_add_alb(ds):
             * ``albedo_toa_fullsky``: TOA albedo under all-sky conditions.
             * ``albedo_toa_clearsky``: TOA albedo under clear-sky conditions.
     """
+    # Validation check
+    vars = ['FSDS', 'FSNS', 'FSDSC', 'FSNSC', 'SOLIN', 'FSNT', 'FSNTC']
+    for var in vars:
+        if var not in ds:
+            raise ValueError(f"Dataset must contain {var} for albedo calculations.")
+        
     # Compute surface albedo using all-sky shortwave fluxes.
     ds['albedo_sfc_fullsky'] = albedo(ds['FSDS'], ds['FSNS'])
 
@@ -473,6 +492,12 @@ def ds_add_rain(ds):
     Returns:
         ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.
     """
+    # Validation check
+    required_precip_vars = ['PRECC', 'PRECL', 'PRECSC', 'PRECSL']
+    for var in required_precip_vars:
+        if var not in ds:
+            raise ValueError(f"Dataset must contain {var} for total precipitation calculation.")
+
     # Total precipitation = convective + large-scale (all components)
     ds['rain'] = ds['PRECC'] + ds['PRECL'] + ds['PRECSC'] + ds['PRECSL']
 
@@ -482,8 +507,7 @@ def multi_apply_along_axis(func1d, axis, arrs, *args, **kwargs):
     """
     Apply a function to multiple arrays along a given axis.
 
-    Extends ``numpy.apply_along_axis`` to support functions that operate
-    on multiple 1D arrays simultaneously.
+    Extends ``numpy.apply_along_axis`` to support functions that operate on multiple 1D arrays simultaneously.
 
     Args:
         func1d (callable): Function that accepts one 1D slice from each array in ``arrs``.
@@ -495,6 +519,8 @@ def multi_apply_along_axis(func1d, axis, arrs, *args, **kwargs):
     Returns:
         numpy.ndarray: Result of applying ``func1d`` along the specified axis of the input arrays.
     """
+
+
     # Combine input arrays so they can be processed by apply_along_axis.
     carrs = np.concatenate(arrs, axis)
 
@@ -518,7 +544,7 @@ def means(ds_case, mask, var):
     Calculates the global, ocean and land mean of a given variable for a given configuration.
 
     Args:
-        ds_case (xarray): dictionnary containing lat and lon dimensions.
+        ds_case (xarray): dictionary containing lat and lon dimensions.
         mask (list): representation of continental distribution, with value 1 if land and value 0 if ocean.
         var (str): name of the variable that needs to be averaged.
 
@@ -556,16 +582,14 @@ def inferred_heat_transport(energy_in, lat_deg):
     """
     Compute inferred northward heat transport from energy imbalance.
 
-    Integrates the zonal-mean net energy imbalance from the South Pole
-    toward the North Pole and converts the result to petawatts (PW).
+    Integrates the zonal-mean net energy imbalance from the South Pole toward the North Pole and converts the result to petawatts (PW).
 
     Args:
-        energy_in (xarray.DataArray): Zonal-mean net energy flux entering
-            the atmosphere (W m^-2).
-        lat_deg (xarray.DataArray): Latitude coordinates in degrees.
+        energy_in (xarray.Dataset): Zonal-mean net energy flux entering the atmosphere (W m^-2).
+        lat_deg (xarray.Dataset): Latitude coordinates in degrees.
 
     Returns:
-        energy_out (xarray.DataArray): Northward heat transport in petawatts (PW).
+        energy_out (xarray.Dataset): Northward heat transport in petawatts (PW).
     """
     # Convert latitude from degrees to radians for integration.
     lat_rad = np.deg2rad(lat_deg)
@@ -585,3 +609,115 @@ def inferred_heat_transport(energy_in, lat_deg):
     # Convert from W to PW and scale by Earth's surface geometry.
     energy_out = 1e-15 * 2 * np.pi * (R_earth**2) * transport
     return energy_out
+
+def humidsat(t, p):
+    """Compute saturation humidity quantities from temperature and pressure.
+
+    Calculates saturation vapor pressure, saturation specific humidity,
+    and saturation mixing ratio using the formulations of Buck (1981).
+    Saturation vapor pressure is computed over liquid water for
+    temperatures above 0°C, over ice for temperatures below -23°C,
+    and interpolated between these limits.
+
+    Args:
+        t (xarray.Dataset): Air temperature in Kelvin.
+        p (xarray.Dataset): Air pressure in hPa.
+
+    Returns:
+        esat (xarray.Dataset): Saturation vapor pressure (hPa).
+        qsat (xarray.Dataset): Saturation specific humidity (kg kg^-1).
+        rsat (xarray.Dataset): Saturation mixing ratio (kg kg^-1).
+    """
+    # Convert temperature from Kelvin to Celsius.
+    tc = t - 273.16
+
+    # Temperature thresholds (°C) for ice, water, and interpolation.
+    tice = -23
+    t0 = 0
+
+    # Gas constants (J kg^-1 K^-1).
+    Rd = 287.04
+    Rv = 461.5
+    epsilon = Rd / Rv
+
+    # Saturation vapor pressure over liquid water (Buck, 1981).
+    ewat = (
+        (1.0007 + (3.46e-6 * p))
+        * 6.1121
+        * np.exp(17.502 * tc / (240.97 + tc))
+    )
+
+    # Saturation vapor pressure over ice (Buck, 1981).
+    eice = (
+        (1.0003 + (4.18e-6 * p))
+        * 6.1115
+        * np.exp(22.452 * tc / (272.55 + tc))
+    )
+
+    # Quadratic interpolation between ice and water formulations.
+    eint = eice + (ewat - eice) * ((tc - tice) / (t0 - tice))**2
+
+    # Use ice values below -23°C, water values above 0°C,
+    # and interpolated values in between.
+    esat = eice.where(tc < tice, eint)
+    esat = ewat.where(tc > t0, esat)
+
+    # Convert saturation vapor pressure to mixing ratio and
+    # specific humidity.
+    rsat = epsilon * esat / (p - esat)
+    qsat = epsilon * esat / (p - esat * (1 - epsilon))
+
+    return esat, qsat, rsat
+
+def meridional_streamfunction(ds, lat_name = 'lat', 
+                              lev_name = 'lev', 
+                              v_name = 'V', 
+                              a = R_earth, 
+                              g = g_earth, 
+                              pressure_factor = 100.0):
+    '''
+    Calculates the meridional stream function from a standard CESM Dataset.
+
+    Args:
+        ds (xarray.Dataset): dictionary containing lon, lat and lev dimensions (time is optional) and meridional wind variable.
+        lat_name (str): name of the latitude dimension of the Dataset ('lat' by default).
+        lev_name (str): name of the pressure level dimension of the Dataset ('lev' by default).
+        v_name (str): name of the meridional wind variable ('V' by default).
+        a (float): radius of the Earth in meters (default: 6.371e6).
+        g (float): acceleration due to gravity in m/s^2 (default: 9.80665).
+        pressure_factor (float): factor to convert pressure levels to Pascals (default: 100.0 for hPa → Pa).
+
+    Return:
+        psi (xarray.DataArray): containing 'lev', 'lat' and 'time' (depends on ds) dimension and values of the meridional stream function.
+    '''
+
+    # Zonal mean for V
+    V_zonal = ds[v_name].mean('lon')  # (year, lev, lat)
+
+    # Verification if pressure levels are ordered
+    lev = ds[lev_name]
+    lev_Pa = lev * pressure_factor  # hPa → Pa
+
+    # dp: pressure thickness of each layer
+    # New dict with dp values (same dimensions than lev)
+    lev_vals = lev_Pa.values
+
+    # create a table with the same shape as lev_vals
+    dp_vals = np.zeros_like(lev_vals)
+
+    # calculate deltas
+    dp_vals[1:-1] = (lev_vals[:-2] - lev_vals[2:]) / 2.0  # center-diff
+    dp_vals[0] = lev_vals[0] - lev_vals[1] # top boundary
+    dp_vals[-1] = lev_vals[-2] - lev_vals[-1] # surface boundary
+
+    # Build DataArray with same lev coords as V_zonal after reordering
+    dp = xr.DataArray(dp_vals, coords={lev_name: lev.values}, dims=[lev_name])
+
+    # Cosinus of latitude
+    cos_lat = np.cos(np.deg2rad(ds[lat_name]))
+
+    # Integration
+    integrand = V_zonal * dp
+    psi = integrand.cumsum(dim=lev_name) * (2 * np.pi * a / g) * cos_lat
+
+    return psi  # (year, lev, lat)
