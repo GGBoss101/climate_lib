@@ -34,7 +34,6 @@ warnings.filterwarnings("ignore", message="Interpolation point out of data bound
 # Vertical integration functions
 #===============================
 
-
 def vert_integral_native(da, var = None, g = g_earth, pressure_factor = 100.0):
     """Vertically integrate a Dataset using Xarray's native calculus.
 
@@ -169,25 +168,26 @@ def vert_int_hybrid(ds, var, ds_hybrid, g = g_earth, P0 = P0pa):
 # Divergence functions
 #=====================
 
-
-def div_uqvq_manual(ds, g = g_earth, R = R_earth):
-    """
-    Compute vertically integrated moisture flux divergence from CESM data.
+def div_uqvq_manual(ds, g=g_earth, R=R_earth):
+    """Compute vertically integrated moisture flux divergence from CESM data.
 
     Args:
-        ds (xarray.Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
+        ds (xarray.Dataset): Input CESM dataset containing variables ``U``,
+          ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
         g (float): Gravitational acceleration in m/s^2 (default: 9.81).
         R (float): Planet radius in meters (default: Earth Radius = 6.371e6).
 
     Returns:
-        qdiv (xarray.Dataset): Vertically integrated moisture divergence (kg m-2 s-1).
+        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg
+          m-2 s-1).
     """
     # Validation checks
     required_vars = ["PS", "U", "V", "Q", "hyai", "hybi"]
     for var in required_vars:
         if var not in ds:
-            raise ValueError(f"Dataset must contain variable '{var}' for this calculation.")
-        
+            raise ValueError(
+                f"Dataset must contain variable '{var}' for this calculation."
+            )
 
     hyai = ds.hyai
     hybi = ds.hybi
@@ -195,52 +195,41 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
     # Default to 100000 Pa if P0 is missing from the dataset
     P0 = ds.get("P0", 100000.0)
 
-    #(time, lat, lon)
     PS = ds.PS
-    #(time, lev, lat, lon)
     U = ds.U
     V = ds.V
     Q = ds.Q
 
     # Compute pressure at interfaces (Pa)
-    # CESM formula: p = A * P0 + B * PS
     p_int = hyai * P0 + hybi * PS
 
-    # Compute pressure thickness Δp between interfaces
-    dp_raw = p_int.diff(dim="ilev")
-    
-    # Swap the coordinate dimension name from 'ilev' to 'lev'
-    dp = dp_raw.rename({"ilev": "lev"}).assign_coords(lev=ds.lev)
+    # Compute pressure thickness Δp between interfaces safely
+    dp = p_int.diff(dim="ilev").drop_vars("ilev").rename({"ilev": "lev"})
+    dp = dp.assign_coords({"lev": ds.lev})
+    dp = abs(dp)
 
-    # Moisture fluxes and vertical integration
-    # Combines flux calculations and integration into streamlined memory passes.
-    UQ = U * Q
-    VQ = V * Q
-    uq_int = (UQ * dp).sum(dim = "lev") / g
-    vq_int = (VQ * dp).sum(dim = "lev") / g
+    # Moisture fluxes and mass-weighted vertical integration
+    uq_int = ((U * Q) * dp).sum(dim="lev") / g
+    vq_int = ((V * Q) * dp).sum(dim="lev") / g
 
-    # Compute horizontal divergence in spherical coordinates
-    # Convert latitude to radians to scale grid cell sizes by latitude circles
+    # Setup metrics for spherical coordinate divergence calculus
     lat_rad = np.deg2rad(ds.lat)
     coslat = np.cos(lat_rad)
-
-    # Convert coordinates from degrees to radians for calculus metrics
     deg_per_rad = 180.0 / np.pi
 
-    # Longitudinal gradient component (scaled by parallel convergence near poles)
-    du_dx = (
-        (uq_int * coslat).differentiate("lon")
-        * deg_per_rad
-        / (R * coslat)
-    )
+    # Zonal component: d(F_lon)/d(lon) / (R * coslat)
+    du_dx = uq_int.differentiate("lon") * deg_per_rad / (R * coslat)
 
-    # Latitudinal gradient component
-    dv_dy = vq_int.differentiate("lat") * deg_per_rad / R
+    # Meridional component: d(F_lat * coslat)/d(lat) / (R * coslat)
+    # Note: We must multiply by coslat BEFORE differentiating, then divide by coslat.
+    dv_dy = (
+        (vq_int * coslat).differentiate("lat") * deg_per_rad / (R * coslat)
+    )
 
     # Combined horizontal moisture divergence
     qdiv = du_dx + dv_dy
 
-    # Attach Metadata (Modifies attributes directly on the generated array)
+    # Attach Metadata safely
     qdiv.name = "QDIV"
     qdiv.attrs = {
         "long_name": "Vertically integrated water vapor divergence",
@@ -248,6 +237,7 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
     }
 
     return qdiv
+
 
 def dominguez_uqdiv(ds,
     dPmb = 25,

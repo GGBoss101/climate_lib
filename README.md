@@ -14,20 +14,22 @@ The library was developed to simplify frequently used climate-analysis workflows
 - Climate-data visualization over North America
 - Working directly with Xarray datasets and DataArrays
 
-## Documentation
-
-It can be found at: <a href="https://ggboss101.github.io/climate_lib/">Documentation Link</a>
-
 ## Installation
 
-To install on a specific conda environment (optional), run the following commands first to activate it, and install git and pip within the environment:
+### Install on a Conda Environment
+Run the following command first to activate the conda environment:
 ```bash
 conda activate <environment_name>
-conda install git pip
 ```
+If git and pip not already installed in the environment, install both with the following commands:
+```bash
+conda install git 
+conda install pip
+```
+Now proceed with the General Installation.
 
+### General Installation
 Run the following command to install the library:
-
 ```bash
 pip install git+https://github.com/GGBoss101/climate_lib
 ```
@@ -36,11 +38,77 @@ If installed on a conda environment, the library will be usable in the kernel (i
 
 ## Python Usage
 
-It can be imported in the following way in python:
+### Import The Whole Library
+
+#### Method 1:
+
+##### Import
+```python
+import climate_lib
+```
+##### Usage
+```python
+climate_lib.<file_name>.<function_name>
+```
+##### Example
+```python
+import climate_lib
+climate_lib.compute.vert_integral(ds, var)
+```
+#### Method 2:
+
+##### Import
 ```python
 from climate_lib import *
 ```
-or for only specific files:
+##### Usage
+```python
+<file_name>.<function_name>
+```
+##### Example
+```python
+from climate_lib import *
+compute.vert_integral(ds, var)
+```
+
+### Import Specific Files
+
+#### Method 3:
+
+##### Import
 ```python
 from climate_lib import <file_name>
 ```
+##### Usage
+```python
+<file_name>.<function_name>
+```
+##### Example
+```python
+from climate_lib import <file_name>
+compute.vert_integral(ds, var)
+```
+
+#### Method 4:
+
+##### Import
+```python
+from climate_lib.<file_name> import *
+```
+##### Usage
+```python
+<function_name>
+```
+##### Example
+```python
+from climate_lib.compute import *
+vert_integral(ds, var)
+```
+
+## Documentation
+
+<a href="https://ggboss101.github.io/climate_lib/">Documentation-Link</a>
+
+## Making Changes
+
+<a href="">WikiPage-Link</a>
