@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatchling-vcs"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -31,7 +31,7 @@ source = "vcs"  # Tells Hatchling to look at Git Tags for the version number
 
 [tool.hatch.version.raw-options]
 # This creates a file at build-time so Python can read the version at runtime
-write_to = "src/your_library_name/_version.py" 
+write_to = "src/climate_lib/_version.py" 
 
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"
