@@ -388,15 +388,13 @@ of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_me
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input CESM dataset containing variables <code class="docutils literal notranslate"><span class="pre">U</span></code>,
-<code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PS</span></code>, and hybrid coordinate coefficients.</p></li>
+<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input CESM dataset containing variables <code class="docutils literal notranslate"><span class="pre">U</span></code>, <code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PS</span></code>, and hybrid coordinate coefficients.</p></li>
 <li><p><strong>g</strong> (<em>float</em>) – Gravitational acceleration in m/s^2 (default: 9.81).</p></li>
 <li><p><strong>R</strong> (<em>float</em>) – Planet radius in meters (default: Earth Radius = 6.371e6).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>qdiv</strong> (<em>xarray.DataArray</em>) – Vertically integrated moisture divergence (kg
-m-2 s-1).</p>
+<dd class="field-even"><p><strong>qdiv</strong> (<em>xarray.DataArray</em>) – Vertically integrated moisture divergence (kg m-2 s-1).</p>
 </dd>
 </dl>
 </dd></dl>

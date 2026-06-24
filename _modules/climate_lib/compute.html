@@ -366,7 +366,7 @@
         <span class="p">)</span>
 
     <span class="c1"># Scale the vertical coordinate values to Pascals (e.g., hPa -&gt; Pa)</span>
-    <span class="n">da_scaled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">lev</span><span class="o">=</span><span class="n">da</span><span class="o">.</span><span class="n">lev</span> <span class="o">*</span> <span class="n">pressure_factor</span><span class="p">)</span>
+    <span class="n">da_scaled</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">lev</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">lev</span> <span class="o">*</span> <span class="n">pressure_factor</span><span class="p">)</span>
 
     <span class="c1"># Perform the mathematical integration along the vertical axis</span>
     <span class="n">raw_integral</span> <span class="o">=</span> <span class="n">da_scaled</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;lev&quot;</span><span class="p">)</span>
@@ -489,14 +489,12 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute vertically integrated moisture flux divergence from CESM data.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        ds (xarray.Dataset): Input CESM dataset containing variables ``U``,</span>
-<span class="sd">          ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.</span>
+<span class="sd">        ds (xarray.Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.</span>
 <span class="sd">        g (float): Gravitational acceleration in m/s^2 (default: 9.81).</span>
 <span class="sd">        R (float): Planet radius in meters (default: Earth Radius = 6.371e6).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg</span>
-<span class="sd">          m-2 s-1).</span>
+<span class="sd">        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg m-2 s-1).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Validation checks</span>
     <span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PS&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;hyai&quot;</span><span class="p">,</span> <span class="s2">&quot;hybi&quot;</span><span class="p">]</span>
