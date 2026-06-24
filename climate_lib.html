@@ -384,17 +384,17 @@ of a variable, using global mean and/or simple zonal mean and/or mirror_zonal_me
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.compute.div_uqvq_manual">
 <span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">div_uqvq_manual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.80665</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6371000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#div_uqvq_manual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.div_uqvq_manual" title="Link to this definition">#</a></dt>
-<dd><p>Compute vertically integrated moisture flux divergence from CESM data.</p>
+<dd><p>Compute vertically integrated moisture flux divergence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input CESM dataset containing variables <code class="docutils literal notranslate"><span class="pre">U</span></code>, <code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PS</span></code>, and hybrid coordinate coefficients.</p></li>
-<li><p><strong>g</strong> (<em>float</em>) – Gravitational acceleration in m/s^2 (default: 9.81).</p></li>
-<li><p><strong>R</strong> (<em>float</em>) – Planet radius in meters (default: Earth Radius = 6.371e6).</p></li>
+<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing U, V, Q, PS, hyai, hybi, and optionally P0.</p></li>
+<li><p><strong>g</strong> (<em>float</em>) – Gravitational acceleration (m s^-2).</p></li>
+<li><p><strong>R</strong> (<em>float</em>) – Planetary radius (m).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>qdiv</strong> (<em>xarray.DataArray</em>) – Vertically integrated moisture divergence (kg m-2 s-1).</p>
+<dd class="field-even"><p><strong>xarray.DataArray</strong> – Vertically integrated moisture divergence (kg m^-2 s^-1).</p>
 </dd>
 </dl>
 </dd></dl>
