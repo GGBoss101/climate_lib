@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.1.1 (2026-06-24)
+
+### Bug Fixes
+
+- Added hatch-vcs as a reuqirement in toml file
+  ([`e3e3d4a`](https://github.com/GGBoss101/climate_lib/commit/e3e3d4ab26074ae393b74f4118a9960bb9ac4ac2))
+
+
 ## v0.1.0 (2026-06-24)
 
 ### Features
