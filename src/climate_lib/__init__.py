@@ -14,3 +14,9 @@ for _, _module_name, _ in pkgutil.iter_modules([_package_dir]):
     
     # 2. Safely attach the module object to this package namespace
     setattr(sys.modules[__name__], _module_name, _module)
+
+# src/your_library_name/__init__.py
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "0.0.0.dev0" # Fallback if code is run uninstalled

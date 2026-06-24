@@ -58,7 +58,7 @@ def vert_integral_native(da, var = None, g = g_earth, pressure_factor = 100.0):
         )
 
     # Scale the vertical coordinate values to Pascals (e.g., hPa -> Pa)
-    da_scaled = da.assign_coords(lev=da.lev * pressure_factor)
+    da_scaled = da.assign_coords(lev = da.lev * pressure_factor)
 
     # Perform the mathematical integration along the vertical axis
     raw_integral = da_scaled.integrate(dim="lev")
@@ -172,14 +172,12 @@ def div_uqvq_manual(ds, g=g_earth, R=R_earth):
     """Compute vertically integrated moisture flux divergence from CESM data.
 
     Args:
-        ds (xarray.Dataset): Input CESM dataset containing variables ``U``,
-          ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
+        ds (xarray.Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
         g (float): Gravitational acceleration in m/s^2 (default: 9.81).
         R (float): Planet radius in meters (default: Earth Radius = 6.371e6).
 
     Returns:
-        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg
-          m-2 s-1).
+        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg m-2 s-1).
     """
     # Validation checks
     required_vars = ["PS", "U", "V", "Q", "hyai", "hybi"]

@@ -1,10 +1,11 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "wheel"]
+build-backend = "hatchling.build"
 
 [project]
 name = "climate_lib"
-version = "0.0.1"
+#version = "0.1.0"
+dynamic = ["version"]
 dependencies = ["numpy",
     "pandas",
     "xarray",
@@ -24,6 +25,13 @@ description = "Climate Functions for the M. Lague Lab"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
+
+[tool.hatch.version]
+source = "vcs"  # Tells Hatchling to look at Git Tags for the version number
+
+[tool.hatch.version.raw-options]
+# This creates a file at build-time so Python can read the version at runtime
+write_to = "src/your_library_name/_version.py" 
 
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"
