@@ -33,6 +33,11 @@ source = "vcs"  # Tells Hatchling to look at Git Tags for the version number
 # This creates a file at build-time so Python can read the version at runtime
 write_to = "src/climate_lib/_version.py" 
 
+[tool.semantic_release]
+branches = ["main"]
+version_source = "tag"
+build_command = "hatch build"
+
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"
 Issues = "https://github.com/GGBoss101/climate_lib/issues"
