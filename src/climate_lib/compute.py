@@ -168,66 +168,84 @@ def vert_int_hybrid(ds, var, ds_hybrid, g = g_earth, P0 = P0pa):
 # Divergence functions
 #=====================
 
-def div_uqvq_manual(ds, g=g_earth, R=R_earth):
-    """Compute vertically integrated moisture flux divergence from CESM data.
+def div_uqvq_manual(ds, g = g_earth, R = R_earth):
+    """Compute vertically integrated moisture flux divergence.
 
     Args:
-        ds (xarray.Dataset): Input CESM dataset containing variables ``U``, ``V``, ``Q``, ``PS``, and hybrid coordinate coefficients.
-        g (float): Gravitational acceleration in m/s^2 (default: 9.81).
-        R (float): Planet radius in meters (default: Earth Radius = 6.371e6).
+        ds (xarray.Dataset): Dataset containing U, V, Q, PS, hyai, hybi, and optionally P0.
+        g (float): Gravitational acceleration (m s^-2).
+        R (float): Planetary radius (m).
 
     Returns:
-        qdiv (xarray.DataArray): Vertically integrated moisture divergence (kg m-2 s-1).
+        xarray.DataArray: Vertically integrated moisture divergence (kg m^-2 s^-1).
     """
-    # Validation checks
+
+    # Validate required inputs
     required_vars = ["PS", "U", "V", "Q", "hyai", "hybi"]
     for var in required_vars:
         if var not in ds:
             raise ValueError(
-                f"Dataset must contain variable '{var}' for this calculation."
+                f"Dataset must contain variable '{var}'."
             )
 
-    hyai = ds.hyai
-    hybi = ds.hybi
+    if "lev" not in ds.coords:
+        raise ValueError(
+            "Dataset must contain 'lev' coordinates."
+        )
 
-    # Default to 100000 Pa if P0 is missing from the dataset
-    P0 = ds.get("P0", 100000.0)
+    # Extract variables
+    U = ds["U"]
+    V = ds["V"]
+    Q = ds["Q"]
+    PS = ds["PS"]
 
-    PS = ds.PS
-    U = ds.U
-    V = ds.V
-    Q = ds.Q
+    hyai = ds["hyai"]
+    hybi = ds["hybi"]
 
-    # Compute pressure at interfaces (Pa)
+    P0 = ds.get("P0", P0pa)
+
+    # Interface pressures (Pa)
     p_int = hyai * P0 + hybi * PS
 
-    # Compute pressure thickness Δp between interfaces safely
-    dp = p_int.diff(dim="ilev").drop_vars("ilev").rename({"ilev": "lev"})
-    dp = dp.assign_coords({"lev": ds.lev})
+    # Layer pressure thicknesses
+    dp = (
+        p_int.diff(dim="ilev")
+        .drop_vars("ilev")
+        .rename({"ilev": "lev"})
+        .assign_coords({"lev": ds.lev})
+    )
+
+    # Protect against reversed level ordering
     dp = abs(dp)
 
-    # Moisture fluxes and mass-weighted vertical integration
+    # Vertically integrated moisture fluxes
     uq_int = ((U * Q) * dp).sum(dim="lev") / g
     vq_int = ((V * Q) * dp).sum(dim="lev") / g
 
-    # Setup metrics for spherical coordinate divergence calculus
+    # Spherical geometry factors
     lat_rad = np.deg2rad(ds.lat)
     coslat = np.cos(lat_rad)
+
     deg_per_rad = 180.0 / np.pi
 
-    # Zonal component: d(F_lon)/d(lon) / (R * coslat)
-    du_dx = uq_int.differentiate("lon") * deg_per_rad / (R * coslat)
-
-    # Meridional component: d(F_lat * coslat)/d(lat) / (R * coslat)
-    # Note: We must multiply by coslat BEFORE differentiating, then divide by coslat.
-    dv_dy = (
-        (vq_int * coslat).differentiate("lat") * deg_per_rad / (R * coslat)
+    # Original formulation
+    du_dx = (
+        (uq_int * coslat)
+        .differentiate("lon")
+        * deg_per_rad
+        / (R * coslat)
     )
 
-    # Combined horizontal moisture divergence
+    dv_dy = (
+        vq_int
+        .differentiate("lat")
+        * deg_per_rad
+        / R
+    )
+
+    # Moisture flux divergence
     qdiv = du_dx + dv_dy
 
-    # Attach Metadata safely
     qdiv.name = "QDIV"
     qdiv.attrs = {
         "long_name": "Vertically integrated water vapor divergence",
