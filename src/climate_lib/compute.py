@@ -582,15 +582,13 @@ def inferred_heat_transport(energy_in, lat_deg):
     Returns:
         energy_out (xarray.Dataset): Northward heat transport in petawatts (PW).
     """
-    # Convert latitude from degrees to radians for integration.
+    # Convert latitude to radians.
     lat_rad = np.deg2rad(lat_deg)
 
-    # Weight the energy imbalance by cos(latitude) to account for
-    # the decreasing area of latitude bands toward the poles.
+    # Apply cos(latitude) area-weighting.
     flux_density = np.cos(lat_rad) * energy_in
 
-    # Integrate cumulatively from south to north using the
-    # trapezoidal rule.
+    # Integrate cumulatively from South to North.
     transport = sp.integrate.cumulative_trapezoid(
         flux_density,
         x=lat_rad,
