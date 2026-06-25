@@ -124,43 +124,39 @@ def vert_int_hybrid(ds, var, ds_hybrid, g = g_earth, P0 = P0pa):
         total_int (xarray.DataArray): The vertically integrated field with the vertical dimension ('lev') integrated out absolutely.
     """
 
-    # Validation checks
+    # Validate inputs
     if var is None:
         raise ValueError("A variable name must be provided for vertical integration.")
     if var not in ds:
         raise ValueError(f"Variable '{var}' not found in the input dataset.")
 
-    # Extract necessary variables and coefficients
+    # Get data and coefficients
     q = ds[var]
     PS = ds_hybrid["PS"]
     hyai = ds_hybrid["hyai"]
     hybi = ds_hybrid["hybi"]
 
-    # Compute interface pressures (Pa) for every grid point and level
-    # Formula: P_interfaces = A(k)*P0 + B(k)*PS
+    # Interface pressures: P = A*P0 + B*PS
     P_i = hyai * P0 + hybi * PS
 
-    # Compute the pressure thickness (dp) of each layer by differencing the interfaces
-    # Formula: dp = P_i(k+1) - P_i(k)
+    # Layer thickness: dp = P(k+1) - P(k)
     dp = P_i.diff(dim="ilev")
 
-    # Adapt coordinates from interfaces ('ilev') to layer centers ('lev')
-    # Dropping 'ilev' variables avoids dimension conflicts during alignment
+    # Match coordinates to layer centers
     dp = dp.drop_vars("ilev").rename({"ilev": "lev"})
     dp = dp.assign_coords({"lev": q.coords["lev"]})
 
-    # Handle vertical grid orientation safely
-    # If dp is negative (levels ordered surface to top), convert to absolute thickness
+    # Ensure positive thickness
     dp = abs(dp)
 
-    # Compute column integration using hydrostatic balance
-    # Formula: (q * dp) / g
+    # Hydrostatic column mass weight
     layer_int = (q * dp) / g
 
-    # Vertically integrate over the level dimension
+    # Sum over vertical dimension
     total_int = layer_int.sum(dim="lev", skipna=True)
 
     return total_int
+
 
 
 
