@@ -438,43 +438,39 @@
 <span class="sd">        total_int (xarray.DataArray): The vertically integrated field with the vertical dimension (&#39;lev&#39;) integrated out absolutely.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># Validation checks</span>
+    <span class="c1"># Validate inputs</span>
     <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A variable name must be provided for vertical integration.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; not found in the input dataset.&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Extract necessary variables and coefficients</span>
+    <span class="c1"># Get data and coefficients</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
     <span class="n">PS</span> <span class="o">=</span> <span class="n">ds_hybrid</span><span class="p">[</span><span class="s2">&quot;PS&quot;</span><span class="p">]</span>
     <span class="n">hyai</span> <span class="o">=</span> <span class="n">ds_hybrid</span><span class="p">[</span><span class="s2">&quot;hyai&quot;</span><span class="p">]</span>
     <span class="n">hybi</span> <span class="o">=</span> <span class="n">ds_hybrid</span><span class="p">[</span><span class="s2">&quot;hybi&quot;</span><span class="p">]</span>
 
-    <span class="c1"># Compute interface pressures (Pa) for every grid point and level</span>
-    <span class="c1"># Formula: P_interfaces = A(k)*P0 + B(k)*PS</span>
+    <span class="c1"># Interface pressures: P = A*P0 + B*PS</span>
     <span class="n">P_i</span> <span class="o">=</span> <span class="n">hyai</span> <span class="o">*</span> <span class="n">P0</span> <span class="o">+</span> <span class="n">hybi</span> <span class="o">*</span> <span class="n">PS</span>
 
-    <span class="c1"># Compute the pressure thickness (dp) of each layer by differencing the interfaces</span>
-    <span class="c1"># Formula: dp = P_i(k+1) - P_i(k)</span>
+    <span class="c1"># Layer thickness: dp = P(k+1) - P(k)</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="n">P_i</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;ilev&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Adapt coordinates from interfaces (&#39;ilev&#39;) to layer centers (&#39;lev&#39;)</span>
-    <span class="c1"># Dropping &#39;ilev&#39; variables avoids dimension conflicts during alignment</span>
+    <span class="c1"># Match coordinates to layer centers</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;ilev&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;ilev&quot;</span><span class="p">:</span> <span class="s2">&quot;lev&quot;</span><span class="p">})</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;lev&quot;</span><span class="p">:</span> <span class="n">q</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;lev&quot;</span><span class="p">]})</span>
 
-    <span class="c1"># Handle vertical grid orientation safely</span>
-    <span class="c1"># If dp is negative (levels ordered surface to top), convert to absolute thickness</span>
+    <span class="c1"># Ensure positive thickness</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span>
 
-    <span class="c1"># Compute column integration using hydrostatic balance</span>
-    <span class="c1"># Formula: (q * dp) / g</span>
+    <span class="c1"># Hydrostatic column mass weight</span>
     <span class="n">layer_int</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">dp</span><span class="p">)</span> <span class="o">/</span> <span class="n">g</span>
 
-    <span class="c1"># Vertically integrate over the level dimension</span>
+    <span class="c1"># Sum over vertical dimension</span>
     <span class="n">total_int</span> <span class="o">=</span> <span class="n">layer_int</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;lev&quot;</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">total_int</span></div>
+
 
 
 
