@@ -34,7 +34,7 @@ source = "vcs"  # Tells Hatchling to look at Git Tags for the version number
 write_to = "src/climate_lib/_version.py" 
 
 [tool.semantic_release]
-branches = ["main"]
+branches.main = { match = "main" }
 version_source = "tag"
 build_command = "hatch build"
 
