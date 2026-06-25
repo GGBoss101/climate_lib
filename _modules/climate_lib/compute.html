@@ -920,15 +920,13 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        energy_out (xarray.Dataset): Northward heat transport in petawatts (PW).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Convert latitude from degrees to radians for integration.</span>
+    <span class="c1"># Convert latitude to radians.</span>
     <span class="n">lat_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">)</span>
 
-    <span class="c1"># Weight the energy imbalance by cos(latitude) to account for</span>
-    <span class="c1"># the decreasing area of latitude bands toward the poles.</span>
+    <span class="c1"># Apply cos(latitude) area-weighting.</span>
     <span class="n">flux_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)</span> <span class="o">*</span> <span class="n">energy_in</span>
 
-    <span class="c1"># Integrate cumulatively from south to north using the</span>
-    <span class="c1"># trapezoidal rule.</span>
+    <span class="c1"># Integrate cumulatively from South to North.</span>
     <span class="n">transport</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">cumulative_trapezoid</span><span class="p">(</span>
         <span class="n">flux_density</span><span class="p">,</span>
         <span class="n">x</span><span class="o">=</span><span class="n">lat_rad</span><span class="p">,</span>
