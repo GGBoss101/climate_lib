@@ -545,7 +545,7 @@
 
     <span class="n">deg_per_rad</span> <span class="o">=</span> <span class="mf">180.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
 
-    <span class="c1"># Original formulation</span>
+    <span class="c1"># Partial flux derivatives in spherical coordinates</span>
     <span class="n">du_dx</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">(</span><span class="n">uq_int</span> <span class="o">*</span> <span class="n">coslat</span><span class="p">)</span>
         <span class="o">.</span><span class="n">differentiate</span><span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">)</span>
