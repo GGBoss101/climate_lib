@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.2.1 (2026-06-25)
+
+### Bug Fixes
+
+- Testing version update for fix prefix
+  ([`ba3d588`](https://github.com/GGBoss101/climate_lib/commit/ba3d588044bb01778d851f6034e2a690292c602b))
+
+### Chores
+
+- Stop bot from making cloud commits
+  ([`749687f`](https://github.com/GGBoss101/climate_lib/commit/749687f6668ac2b82f97473e7b32f30bbf23d3f6))
+
+
 ## v0.2.0 (2026-06-25)
 
 ### Bug Fixes
