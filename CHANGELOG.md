@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.2.4 (2026-06-25)
+
+### Bug Fixes
+
+- Testing versioning - 2
+  ([`a9f09d4`](https://github.com/GGBoss101/climate_lib/commit/a9f09d4aafa79edc0fdbc43c297e9a084f3eda34))
+
+- Testing vversioning - 3
+  ([`eff4842`](https://github.com/GGBoss101/climate_lib/commit/eff48425ae1d2bf1e2a3cfc3e1d15fb2c258c077))
+
+
 ## v0.2.3 (2026-06-25)
 
 ### Bug Fixes
