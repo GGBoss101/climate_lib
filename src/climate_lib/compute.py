@@ -281,9 +281,8 @@ def dominguez_uqdiv(ds,
         if var not in ds:
             raise ValueError(f"Dataset must contain variable '{var}' for this calculation.")
     ds_ctrl = ds
-    
-    # Calculate moisture flux divergence (qv vi -> q_div -> diff -> tavg)
 
+    # Calculate moisture flux divergence (qv vi -> q_div -> diff -> tavg)
     U_ctrl = ds_ctrl.U
     V_ctrl = ds_ctrl.V
     Q_ctrl = ds_ctrl.Q
