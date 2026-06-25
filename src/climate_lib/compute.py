@@ -328,8 +328,6 @@ def dominguez_uqdiv(ds,
     lat_rad = np.deg2rad(lat)
     lon_rad = np.deg2rad(lon)
 
-    dlat = np.gradient(lat_rad)
-    dlon = np.gradient(lon_rad)
 
     cosphi = np.cos(lat_rad.values)
 
