@@ -36,7 +36,7 @@ write_to = "src/climate_lib/_version.py"
 [tool.semantic_release]
 branches.main = { match = "main" }
 version_source = "tag"
-build_command = "hatch build"
+build_command = ""
 
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"

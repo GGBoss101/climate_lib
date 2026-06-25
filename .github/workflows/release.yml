@@ -20,8 +20,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      # This tool reads commit messages to decide if it's a major, minor, or patch bump
+      # 1. Calculate next version, write changelog, and push the Git Tag
       - name: Python Semantic Release
         uses: python-semantic-release/python-semantic-release@v9
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Install Hatch on the actual runner machine
+      - name: Install Build Tools
+        run: pip install hatch
+
+      # 3. Build your actual library wheel files
+      - name: Build Distribution Packages
+        run: hatch build
