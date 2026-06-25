@@ -36,13 +36,6 @@ write_to = "src/climate_lib/_version.py"
 [tool.semantic_release]
 branches.main = { match = "main" }
 version_source = "tag"
-build_command = ""
-# 1. Turn off local system file commits entirely
-commit = false
-# 2. Turn off the automatic git pusher hook inside PSR
-push = false
-# 3. Tell the tool not to write or track a physical changelog file
-changelog.default_templates.changelog_file = ""
 
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"
