@@ -37,6 +37,7 @@ write_to = "src/climate_lib/_version.py"
 branches.main = { match = "main" }
 version_source = "tag"
 build_command = ""
+commit_version_number = false
 
 [project.urls]
 Homepage = "https://github.com/GGBoss101/climate_lib"
