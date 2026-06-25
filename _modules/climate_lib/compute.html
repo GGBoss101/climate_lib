@@ -601,9 +601,8 @@
         <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; for this calculation.&quot;</span><span class="p">)</span>
     <span class="n">ds_ctrl</span> <span class="o">=</span> <span class="n">ds</span>
-    
-    <span class="c1"># Calculate moisture flux divergence (qv vi -&gt; q_div -&gt; diff -&gt; tavg)</span>
 
+    <span class="c1"># Calculate moisture flux divergence (qv vi -&gt; q_div -&gt; diff -&gt; tavg)</span>
     <span class="n">U_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">U</span>
     <span class="n">V_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">V</span>
     <span class="n">Q_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="o">.</span><span class="n">Q</span>
