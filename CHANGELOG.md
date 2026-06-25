@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.2.2 (2026-06-25)
+
+### Bug Fixes
+
+- Testing the versioning, improved comments for vert_int_hybrix
+  ([`22c1689`](https://github.com/GGBoss101/climate_lib/commit/22c16898bdd49568130c5c8a39fad76e55188efb))
+
+
 ## v0.2.1 (2026-06-25)
 
 ### Bug Fixes
