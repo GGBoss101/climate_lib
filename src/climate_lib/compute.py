@@ -283,11 +283,9 @@ def dominguez_uqdiv(ds,
     ds_ctrl = ds
     # Calculate moisture flux divergence (qv vi -> q_div -> diff -> tavg)
 
-
     U_ctrl = ds_ctrl.U
     V_ctrl = ds_ctrl.V
     Q_ctrl = ds_ctrl.Q
-
 
     PS = ds.PS # (time, lat, lon)
 
@@ -314,20 +312,14 @@ def dominguez_uqdiv(ds,
     U_ctrl = vertically_interpolate('U', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl, interpolate_method)
     V_ctrl = vertically_interpolate('V', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl, interpolate_method)
     Q_ctrl = vertically_interpolate('Q', ds_ctrl, pnew, PS, hyam_ctrl, hybm_ctrl, P0pa_ctrl, interpolate_method)
-
-    ctrl_plev = xr.Dataset({'U': U_ctrl, 'V': V_ctrl, 'Q': Q_ctrl})
-
-    
     
     # Vertically integrated qv
     VIMF_ctrl_x = np.nansum(U_ctrl * Q_ctrl * dP, axis = 1) / g
     VIMF_ctrl_y = np.nansum(V_ctrl * Q_ctrl * dP, axis = 1) / g
 
-
     # get the cosine stuff in
     lat_rad = np.deg2rad(lat)
     lon_rad = np.deg2rad(lon)
-
 
     cosphi = np.cos(lat_rad.values)
 
@@ -348,7 +340,6 @@ def dominguez_uqdiv(ds,
     varname = 'Q'
 
     var_ctrl = ds_ctrl[varname]  # (time:30, lev:30, lat:192, lon:288)
-
 
     VIMF_ctrl_x_da = xr.Dataset(data=VIMF_ctrl_x, 
                                 dims=['time','lat','lon'], 
