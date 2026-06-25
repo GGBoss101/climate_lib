@@ -228,7 +228,7 @@ def div_uqvq_manual(ds, g = g_earth, R = R_earth):
 
     deg_per_rad = 180.0 / np.pi
 
-    # Original formulation
+    # Partial flux derivatives in spherical coordinates
     du_dx = (
         (uq_int * coslat)
         .differentiate("lon")
