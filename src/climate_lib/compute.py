@@ -595,7 +595,7 @@ def inferred_heat_transport(energy_in, lat_deg):
         initial=0.0
     )
 
-    # Convert from W to PW and scale by Earth's surface geometry.
+    # Convert from W to PW and scale by the Earth's surface geometry.
     energy_out = 1e-15 * 2 * np.pi * (R_earth**2) * transport
     return energy_out
 
