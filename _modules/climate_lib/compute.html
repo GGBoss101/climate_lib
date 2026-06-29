@@ -987,13 +987,11 @@
     <span class="c1"># Quadratic interpolation between ice and water formulations.</span>
     <span class="n">eint</span> <span class="o">=</span> <span class="n">eice</span> <span class="o">+</span> <span class="p">(</span><span class="n">ewat</span> <span class="o">-</span> <span class="n">eice</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">tc</span> <span class="o">-</span> <span class="n">tice</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">t0</span> <span class="o">-</span> <span class="n">tice</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
 
-    <span class="c1"># Use ice values below -23°C, water values above 0°C,</span>
-    <span class="c1"># and interpolated values in between.</span>
+    <span class="c1"># Use ice values below -23°C, water values above 0°C, and interpolated values in between.</span>
     <span class="n">esat</span> <span class="o">=</span> <span class="n">eice</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tc</span> <span class="o">&lt;</span> <span class="n">tice</span><span class="p">,</span> <span class="n">eint</span><span class="p">)</span>
     <span class="n">esat</span> <span class="o">=</span> <span class="n">ewat</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tc</span> <span class="o">&gt;</span> <span class="n">t0</span><span class="p">,</span> <span class="n">esat</span><span class="p">)</span>
 
-    <span class="c1"># Convert saturation vapor pressure to mixing ratio and</span>
-    <span class="c1"># specific humidity.</span>
+    <span class="c1"># Convert saturation vapor pressure to mixing ratio and specific humidity.</span>
     <span class="n">rsat</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">esat</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">esat</span><span class="p">)</span>
     <span class="n">qsat</span> <span class="o">=</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">esat</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">esat</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">))</span>
 
