@@ -646,13 +646,11 @@ def humidsat(t, p):
     # Quadratic interpolation between ice and water formulations.
     eint = eice + (ewat - eice) * ((tc - tice) / (t0 - tice))**2
 
-    # Use ice values below -23°C, water values above 0°C,
-    # and interpolated values in between.
+    # Use ice values below -23°C, water values above 0°C, and interpolated values in between.
     esat = eice.where(tc < tice, eint)
     esat = ewat.where(tc > t0, esat)
 
-    # Convert saturation vapor pressure to mixing ratio and
-    # specific humidity.
+    # Convert saturation vapor pressure to mixing ratio and specific humidity.
     rsat = epsilon * esat / (p - esat)
     qsat = epsilon * esat / (p - esat * (1 - epsilon))
 
