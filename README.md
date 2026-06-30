@@ -105,6 +105,29 @@ from climate_lib.compute import *
 vert_integral(ds, var)
 ```
 
+## Git Commit Guidelines
+
+We use [Conventional Commits](https://conventionalcommits.org) to automatically manage release notes and Semantic Versioning (SemVer). 
+
+### SemVer-Triggering Commits
+These prefixes directly automate version bumps:
+* **`fix:`** Triggers a **PATCH** version bump (e.g., `1.0.0` to `1.0.1`). Fixes a bug.
+* **`feat:`** Triggers a **MINOR** version bump (e.g., `1.0.0` to `1.1.0`). Introduces a new feature.
+* **`!` or `BREAKING CHANGE:`** Triggers a **MAJOR** version bump (e.g., `1.0.0` to `2.0.0`). Introduces breaking API changes. 
+  * *Example:* `feat(api)!: remove deprecated v1 endpoints`
+
+### Non-Semantic Commits
+These prefixes do not trigger a version increment:
+* **`chore:`** Maintenance tasks, dependency updates, or tool configurations.
+* **`docs:`** Documentation changes only (e.g., README updates).
+* **`style:`** Code formatting (spaces, commas, linting) without code meaning changes.
+* **`refactor:`** Code changes that neither fix a bug nor add a feature.
+* **`perf:`** Code changes that improve performance.
+* **`test:`** Adding missing tests or correcting existing tests.
+* **`ci:`** Changes to continuous integration files and scripts (e.g., GitHub Actions).
+
+*Example Commit Message:* `feat(auth): add Google login integration`
+
 ## Documentation
 
 <a href="https://ggboss101.github.io/climate_lib/">Documentation-Link</a>
