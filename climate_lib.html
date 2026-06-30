@@ -425,44 +425,6 @@ using pressure-level interpolation.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="climate_lib.compute.ds_add_alb">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">ds_add_alb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#ds_add_alb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.ds_add_alb" title="Link to this definition">#</a></dt>
-<dd><p>Add surface and top-of-atmosphere albedo variables to a dataset.</p>
-<p>Computes full-sky and clear-sky albedo at both the surface and the
-top of the atmosphere (TOA) using the <code class="docutils literal notranslate"><span class="pre">albedo</span></code> helper function, and
-stores the results as new variables in the dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing the radiation variables required for albedo calculations: <code class="docutils literal notranslate"><span class="pre">FSDS</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNS</span></code>, <code class="docutils literal notranslate"><span class="pre">FSDSC</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNSC</span></code>, <code class="docutils literal notranslate"><span class="pre">SOLIN</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNT</span></code>, and <code class="docutils literal notranslate"><span class="pre">FSNTC</span></code>.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – The input dataset with the following additional variables:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">albedo_sfc_fullsky</span></code>: Surface albedo under all-sky conditions.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">albedo_sfc_clearsky</span></code>: Surface albedo under clear-sky conditions.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">albedo_toa_fullsky</span></code>: TOA albedo under all-sky conditions.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">albedo_toa_clearsky</span></code>: TOA albedo under clear-sky conditions.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="climate_lib.compute.ds_add_rain">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">ds_add_rain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#ds_add_rain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.ds_add_rain" title="Link to this definition">#</a></dt>
-<dd><p>Compute total precipitation and add it to the dataset.</p>
-<p>Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input dataset with an added <code class="docutils literal notranslate"><span class="pre">rain</span></code> variable representing total precipitation.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.compute.humidsat">
 <span class="sig-prename descclassname"><span class="pre">climate_lib.compute.</span></span><span class="sig-name descname"><span class="pre">humidsat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/compute.html#humidsat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.compute.humidsat" title="Link to this definition">#</a></dt>
 <dd><p>Compute saturation humidity quantities from temperature and pressure.</p>
@@ -693,6 +655,70 @@ of an Xarray Dataset.</p>
 </dd></dl>
 
 </section>
+<section id="module-climate_lib.dataset">
+<span id="climate-lib-dataset-module"></span><h2>climate_lib.dataset module<a class="headerlink" href="#module-climate_lib.dataset" title="Link to this heading">#</a></h2>
+<p>This module contains functions for manipulating climate datasets.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="climate_lib.dataset.ds_add_alb">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.dataset.</span></span><span class="sig-name descname"><span class="pre">ds_add_alb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/dataset.html#ds_add_alb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.dataset.ds_add_alb" title="Link to this definition">#</a></dt>
+<dd><p>Add surface and top-of-atmosphere albedo variables to a dataset.</p>
+<p>Computes full-sky and clear-sky albedo at both the surface and the
+top of the atmosphere (TOA) using the <code class="docutils literal notranslate"><span class="pre">albedo</span></code> helper function, and
+stores the results as new variables in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing the radiation variables required for albedo calculations: <code class="docutils literal notranslate"><span class="pre">FSDS</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNS</span></code>, <code class="docutils literal notranslate"><span class="pre">FSDSC</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNSC</span></code>, <code class="docutils literal notranslate"><span class="pre">SOLIN</span></code>, <code class="docutils literal notranslate"><span class="pre">FSNT</span></code>, and <code class="docutils literal notranslate"><span class="pre">FSNTC</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – The input dataset with the following additional variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">albedo_sfc_fullsky</span></code>: Surface albedo under all-sky conditions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">albedo_sfc_clearsky</span></code>: Surface albedo under clear-sky conditions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">albedo_toa_fullsky</span></code>: TOA albedo under all-sky conditions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">albedo_toa_clearsky</span></code>: TOA albedo under clear-sky conditions.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="climate_lib.dataset.ds_add_rain">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.dataset.</span></span><span class="sig-name descname"><span class="pre">ds_add_rain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/dataset.html#ds_add_rain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.dataset.ds_add_rain" title="Link to this definition">#</a></dt>
+<dd><p>Compute total precipitation and add it to the dataset. Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input dataset with an added <code class="docutils literal notranslate"><span class="pre">rain</span></code> variable representing total precipitation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="climate_lib.dataset.make_ds">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.dataset.</span></span><span class="sig-name descname"><span class="pre">make_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da_temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_units</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/dataset.html#make_ds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.dataset.make_ds" title="Link to this definition">#</a></dt>
+<dd><p>Convert a DataArray into a Dataset with metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>da_temp</strong> (<em>xarray.DataArray</em>) – Input data array.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Variable name for the output dataset.</p></li>
+<li><p><strong>longname</strong> (<em>str</em>) – Descriptive variable name.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – Dataset title.</p></li>
+<li><p><strong>pos_dir</strong> (<em>str</em>) – Positive direction of the variable.</p></li>
+<li><p><strong>units</strong> (<em>str</em>) – Variable units.</p></li>
+<li><p><strong>full_units</strong> (<em>str</em>) – Expanded description of the units.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>xarray.Dataset</strong> – Dataset containing the input data with updated
+metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-climate_lib.plotting">
 <span id="climate-lib-plotting-module"></span><h2>climate_lib.plotting module<a class="headerlink" href="#module-climate_lib.plotting" title="Link to this heading">#</a></h2>
 <p>This module contains functions for plotting climate data, including maps and other visualizations.</p>
@@ -826,8 +852,6 @@ of an Xarray Dataset.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-climate_lib.compute">climate_lib.compute module</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.div_uqvq_manual"><code class="docutils literal notranslate"><span class="pre">div_uqvq_manual()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.dominguez_uqdiv"><code class="docutils literal notranslate"><span class="pre">dominguez_uqdiv()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.ds_add_alb"><code class="docutils literal notranslate"><span class="pre">ds_add_alb()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.ds_add_rain"><code class="docutils literal notranslate"><span class="pre">ds_add_rain()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.humidsat"><code class="docutils literal notranslate"><span class="pre">humidsat()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.inferred_heat_transport"><code class="docutils literal notranslate"><span class="pre">inferred_heat_transport()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.compute.linear_trend"><code class="docutils literal notranslate"><span class="pre">linear_trend()</span></code></a></li>
@@ -843,6 +867,12 @@ of an Xarray Dataset.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.constants.g_earth"><code class="docutils literal notranslate"><span class="pre">g_earth</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.constants.R_earth"><code class="docutils literal notranslate"><span class="pre">R_earth</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.constants.P0pa"><code class="docutils literal notranslate"><span class="pre">P0pa</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-climate_lib.dataset">climate_lib.dataset module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.ds_add_alb"><code class="docutils literal notranslate"><span class="pre">ds_add_alb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.ds_add_rain"><code class="docutils literal notranslate"><span class="pre">ds_add_rain()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.make_ds"><code class="docutils literal notranslate"><span class="pre">make_ds()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-climate_lib.plotting">climate_lib.plotting module</a><ul class="nav section-nav flex-column">
