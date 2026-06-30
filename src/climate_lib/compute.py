@@ -432,68 +432,6 @@ def linear_trend(da):
 # General Calculations
 #=====================
 
-def ds_add_alb(ds):
-    """
-    Add surface and top-of-atmosphere albedo variables to a dataset.
-
-    Computes full-sky and clear-sky albedo at both the surface and the
-    top of the atmosphere (TOA) using the ``albedo`` helper function, and
-    stores the results as new variables in the dataset.
-
-    Args:
-        ds (xarray.Dataset): Dataset containing the radiation variables required for albedo calculations: ``FSDS``, ``FSNS``, ``FSDSC``, ``FSNSC``, ``SOLIN``, ``FSNT``, and ``FSNTC``.
-
-    Returns:
-        ds (xarray.Dataset): The input dataset with the following additional variables:
-
-            * ``albedo_sfc_fullsky``: Surface albedo under all-sky conditions.
-            * ``albedo_sfc_clearsky``: Surface albedo under clear-sky conditions.
-            * ``albedo_toa_fullsky``: TOA albedo under all-sky conditions.
-            * ``albedo_toa_clearsky``: TOA albedo under clear-sky conditions.
-    """
-    # Validation check
-    vars = ['FSDS', 'FSNS', 'FSDSC', 'FSNSC', 'SOLIN', 'FSNT', 'FSNTC']
-    for var in vars:
-        if var not in ds:
-            raise ValueError(f"Dataset must contain {var} for albedo calculations.")
-        
-    # Compute surface albedo using all-sky shortwave fluxes.
-    ds['albedo_sfc_fullsky'] = albedo(ds['FSDS'], ds['FSNS'])
-
-    # Compute surface albedo using clear-sky shortwave fluxes.
-    ds['albedo_sfc_clearsky'] = albedo(ds['FSDSC'], ds['FSNSC'])
-
-    # Compute TOA albedo using all-sky shortwave fluxes.
-    ds['albedo_toa_fullsky'] = albedo(ds['SOLIN'], ds['FSNT'])
-
-    # Compute TOA albedo using clear-sky shortwave fluxes.
-    ds['albedo_toa_clearsky'] = albedo(ds['SOLIN'], ds['FSNTC'])
-
-    return ds
-
-def ds_add_rain(ds):
-    """
-    Compute total precipitation and add it to the dataset.
-
-    Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.
-
-    Args:
-        ds (xarray.Dataset): Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.
-
-    Returns:
-        ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.
-    """
-    # Validation check
-    required_precip_vars = ['PRECC', 'PRECL', 'PRECSC', 'PRECSL']
-    for var in required_precip_vars:
-        if var not in ds:
-            raise ValueError(f"Dataset must contain {var} for total precipitation calculation.")
-
-    # Total precipitation = convective + large-scale (all components)
-    ds['rain'] = ds['PRECC'] + ds['PRECL'] + ds['PRECSC'] + ds['PRECSL']
-
-    return ds
-
 def multi_apply_along_axis(func1d, axis, arrs, *args, **kwargs):
     """
     Apply a function to multiple arrays along a given axis.
