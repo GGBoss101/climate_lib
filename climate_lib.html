@@ -330,24 +330,28 @@
 <p>This module contains functions concerning CESM datasets.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="climate_lib.cesm.cesm_time">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.cesm.</span></span><span class="sig-name descname"><span class="pre">cesm_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/cesm.html#cesm_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.cesm.cesm_time" title="Link to this definition">#</a></dt>
-<dd><p>Adjust CESM time coordinates and restrict data to years 20–49.</p>
+<span class="sig-prename descclassname"><span class="pre">climate_lib.cesm.</span></span><span class="sig-name descname"><span class="pre">cesm_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/cesm.html#cesm_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.cesm.cesm_time" title="Link to this definition">#</a></dt>
+<dd><p>Adjust CESM time coordinates and restrict data to years y_start to y_end.</p>
 <p>CESM monthly output timestamps are shifted 15 days backward so that
 each timestamp aligns with the month represented by the data. After
 adjusting the time coordinate, all records outside simulation years
-20–49 are removed.</p>
+y_start to y_end are removed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing a <code class="docutils literal notranslate"><span class="pre">time</span></code> coordinate with valid <code class="docutils literal notranslate"><span class="pre">units</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar</span></code> attributes compatible with <code class="docutils literal notranslate"><span class="pre">cftime.num2date</span></code>.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset containing a <code class="docutils literal notranslate"><span class="pre">time</span></code> coordinate with valid <code class="docutils literal notranslate"><span class="pre">units</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar</span></code> attributes compatible with <code class="docutils literal notranslate"><span class="pre">cftime.num2date</span></code>.</p></li>
+<li><p><strong>y_start</strong> (<em>int</em>) – Starting year for the simulation period.</p></li>
+<li><p><strong>y_end</strong> (<em>int</em>) – Ending year for the simulation period.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset with corrected time coordinates and only observations from years 20–49 retained.</p>
+<dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Dataset with corrected time coordinates and only observations from years y_start to y_end retained.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>The 15-day offset is applied to align monthly averages with the
-calendar month they represent. Data from years before 20 or after
-49 are dropped.</p>
+calendar month they represent. Data from years before y_start or after
+y_end are dropped.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -682,8 +686,8 @@ stores the results as new variables in the dataset.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="climate_lib.dataset.ds_add_rain">
-<span class="sig-prename descclassname"><span class="pre">climate_lib.dataset.</span></span><span class="sig-name descname"><span class="pre">ds_add_rain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/dataset.html#ds_add_rain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.dataset.ds_add_rain" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="climate_lib.dataset.ds_add_prec_rain_snow">
+<span class="sig-prename descclassname"><span class="pre">climate_lib.dataset.</span></span><span class="sig-name descname"><span class="pre">ds_add_prec_rain_snow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climate_lib/dataset.html#ds_add_prec_rain_snow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#climate_lib.dataset.ds_add_prec_rain_snow" title="Link to this definition">#</a></dt>
 <dd><p>Compute total precipitation and add it to the dataset. Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -693,6 +697,10 @@ stores the results as new variables in the dataset.</p>
 <dd class="field-even"><p><strong>ds</strong> (<em>xarray.Dataset</em>) – Input dataset with an added <code class="docutils literal notranslate"><span class="pre">rain</span></code> variable representing total precipitation.</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These are all rates that are being used/calculated.</p>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -712,8 +720,7 @@ stores the results as new variables in the dataset.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>xarray.Dataset</strong> – Dataset containing the input data with updated
-metadata.</p>
+<dd class="field-even"><p><strong>xarray.Dataset</strong> – Dataset containing the input data with updated metadata.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -871,7 +878,7 @@ metadata.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-climate_lib.dataset">climate_lib.dataset module</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.ds_add_alb"><code class="docutils literal notranslate"><span class="pre">ds_add_alb()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.ds_add_rain"><code class="docutils literal notranslate"><span class="pre">ds_add_rain()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.ds_add_prec_rain_snow"><code class="docutils literal notranslate"><span class="pre">ds_add_prec_rain_snow()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#climate_lib.dataset.make_ds"><code class="docutils literal notranslate"><span class="pre">make_ds()</span></code></a></li>
 </ul>
 </li>

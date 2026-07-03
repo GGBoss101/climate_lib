@@ -434,25 +434,27 @@
 
 <div class="viewcode-block" id="cesm_time">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.cesm_time">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">cesm_time</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cesm_time</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Adjust CESM time coordinates and restrict data to years 20–49.</span>
+<span class="sd">    Adjust CESM time coordinates and restrict data to years y_start to y_end.</span>
 
 <span class="sd">    CESM monthly output timestamps are shifted 15 days backward so that</span>
 <span class="sd">    each timestamp aligns with the month represented by the data. After</span>
 <span class="sd">    adjusting the time coordinate, all records outside simulation years</span>
-<span class="sd">    20–49 are removed.</span>
+<span class="sd">    y_start to y_end are removed.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.</span>
+<span class="sd">        y_start (int): Starting year for the simulation period.</span>
+<span class="sd">        y_end (int): Ending year for the simulation period.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.</span>
+<span class="sd">        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years y_start to y_end retained.</span>
 
 <span class="sd">    Notes:</span>
 <span class="sd">        The 15-day offset is applied to align monthly averages with the</span>
-<span class="sd">        calendar month they represent. Data from years before 20 or after</span>
-<span class="sd">        49 are dropped.</span>
+<span class="sd">        calendar month they represent. Data from years before y_start or after</span>
+<span class="sd">        y_end are dropped.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Shift timestamps backward by 15 days to align monthly means with</span>
     <span class="c1"># the calendar month represented by the data.</span>
@@ -466,8 +468,8 @@
     <span class="c1"># Replace the dataset&#39;s time coordinate with the adjusted timestamps.</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">time2</span><span class="p">})</span>
 
-    <span class="c1"># Retain only years 20–49 of the simulation.</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">)),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Retain only years y_start to y_end of the simulation.</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 

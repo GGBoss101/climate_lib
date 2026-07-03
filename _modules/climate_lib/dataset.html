@@ -361,8 +361,7 @@
 <span class="sd">        full_units (str): Expanded description of the units.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        xarray.Dataset: Dataset containing the input data with updated</span>
-<span class="sd">            metadata.</span>
+<span class="sd">        xarray.Dataset: Dataset containing the input data with updated metadata.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Assign metadata to the DataArray.</span>
@@ -378,9 +377,9 @@
     <span class="k">return</span> <span class="n">ds_new</span></div>
 
 
-<div class="viewcode-block" id="ds_add_rain">
-<a class="viewcode-back" href="../../climate_lib.html#climate_lib.dataset.ds_add_rain">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ds_add_rain</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+<div class="viewcode-block" id="ds_add_prec_rain_snow">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.dataset.ds_add_prec_rain_snow">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ds_add_prec_rain_snow</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute total precipitation and add it to the dataset. Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.</span>
 <span class="sd">    </span>
@@ -389,15 +388,34 @@
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        These are all rates that are being used/calculated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Validation check</span>
     <span class="n">required_precip_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECSC&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECSL&#39;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">required_precip_vars</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for total precipitation calculation.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for the calculations.&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Total precipitation = convective + large-scale (all components)</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECL&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSL&#39;</span><span class="p">]</span>
+    <span class="c1"># Total precipitation = convective + large-scale precipitation</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECL&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Total snowfall = convective + large-scale snowfall</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSL&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Total rainfall = total precipitation - total snowfall</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Copy the metadata attributes</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Update the &#39;long_name&#39; so the plot titles are accurate</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Precipitation Rate&#39;</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Snowfall Rate (Water Equivalent)&#39;</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Rainfall Rate&#39;</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 
