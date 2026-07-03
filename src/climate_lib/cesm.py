@@ -123,25 +123,27 @@ def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal
     return ds_zeros, ds_mean_new, ds_zonal_new, ds_mirror_zonal_new
 
 
-def cesm_time(ds):
+def cesm_time(ds, y_start, y_end):
     """
-    Adjust CESM time coordinates and restrict data to years 20–49.
+    Adjust CESM time coordinates and restrict data to years y_start to y_end.
 
     CESM monthly output timestamps are shifted 15 days backward so that
     each timestamp aligns with the month represented by the data. After
     adjusting the time coordinate, all records outside simulation years
-    20–49 are removed.
+    y_start to y_end are removed.
 
     Args:
         ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.
+        y_start (int): Starting year for the simulation period.
+        y_end (int): Ending year for the simulation period.
 
     Returns:
-        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.
+        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years y_start to y_end retained.
 
     Notes:
         The 15-day offset is applied to align monthly averages with the
-        calendar month they represent. Data from years before 20 or after
-        49 are dropped.
+        calendar month they represent. Data from years before y_start or after
+        y_end are dropped.
     """
     # Shift timestamps backward by 15 days to align monthly means with
     # the calendar month represented by the data.
@@ -155,7 +157,7 @@ def cesm_time(ds):
     # Replace the dataset's time coordinate with the adjusted timestamps.
     ds = ds.assign_coords({'time': time2})
 
-    # Retain only years 20–49 of the simulation.
-    ds = ds.where(ds['time'].dt.year.isin(range(20, 50)), drop=True)
+    # Retain only years y_start to y_end of the simulation.
+    ds = ds.where(ds['time'].dt.year.isin(range(y_start, y_end + 1)), drop=True)
 
     return ds

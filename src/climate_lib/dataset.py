@@ -53,8 +53,7 @@ def make_ds(
         full_units (str): Expanded description of the units.
 
     Returns:
-        xarray.Dataset: Dataset containing the input data with updated
-            metadata.
+        xarray.Dataset: Dataset containing the input data with updated metadata.
     """
 
     # Assign metadata to the DataArray.
@@ -69,7 +68,7 @@ def make_ds(
 
     return ds_new
 
-def ds_add_rain(ds):
+def ds_add_prec_rain_snow(ds):
     """
     Compute total precipitation and add it to the dataset. Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.
     
@@ -78,15 +77,34 @@ def ds_add_rain(ds):
     
     Returns:
         ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.
+
+    Note:
+        These are all rates that are being used/calculated.
     """
     # Validation check
     required_precip_vars = ['PRECC', 'PRECL', 'PRECSC', 'PRECSL']
     for var in required_precip_vars:
         if var not in ds:
-            raise ValueError(f"Dataset must contain {var} for total precipitation calculation.")
+            raise ValueError(f"Dataset must contain {var} for the calculations.")
 
-    # Total precipitation = convective + large-scale (all components)
-    ds['rain'] = ds['PRECC'] + ds['PRECL'] + ds['PRECSC'] + ds['PRECSL']
+    # Total precipitation = convective + large-scale precipitation
+    ds['PRECT'] = ds['PRECC'] + ds['PRECL']
+
+    # Total snowfall = convective + large-scale snowfall
+    ds['snow'] = ds['PRECSC'] + ds['PRECSL']
+
+    # Total rainfall = total precipitation - total snowfall
+    ds['rain'] = ds['PRECT'] - ds['snow']
+
+    # Copy the metadata attributes
+    ds['PRECT'].attrs = ds['PRECC'].attrs.copy()
+    ds['snow'].attrs = ds['PRECSC'].attrs.copy()
+    ds['rain'].attrs = ds['PRECC'].attrs.copy()
+
+    # Update the 'long_name' so the plot titles are accurate
+    ds['PRECT'].attrs['long_name'] = 'Total Precipitation Rate'
+    ds['snow'].attrs['long_name'] = 'Total Snowfall Rate (Water Equivalent)'
+    ds['rain'].attrs['long_name'] = 'Total Rainfall Rate'
 
     return ds
 
