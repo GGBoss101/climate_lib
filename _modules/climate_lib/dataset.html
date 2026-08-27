@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -304,9 +304,9 @@
                 <article class="bd-article">
                   
   <h1>Source code for climate_lib.dataset</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module contains functions for manipulating climate datasets.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <span class="c1"># import modules</span>
@@ -334,8 +334,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Interpolation point out of data bounds encountered&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">".*multiple fill values.*"</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">"Interpolation point out of data bounds encountered"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="make_ds">
@@ -349,7 +349,7 @@
     <span class="n">units</span><span class="p">,</span>
     <span class="n">full_units</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a DataArray into a Dataset with metadata.</span>
+<span class="w">    </span><span class="sd">"""Convert a DataArray into a Dataset with metadata.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        da_temp (xarray.DataArray): Input data array.</span>
@@ -362,14 +362,14 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        xarray.Dataset: Dataset containing the input data with updated metadata.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Assign metadata to the DataArray.</span>
-    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
-    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;longname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">longname</span>
-    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;positive_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos_dir</span>
-    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
-    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;full_units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_units</span>
+    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"units"</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"longname"</span><span class="p">]</span> <span class="o">=</span> <span class="n">longname</span>
+    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"positive_dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos_dir</span>
+    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+    <span class="n">da_temp</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"full_units"</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_units</span>
 
     <span class="c1"># Convert the DataArray into a Dataset.</span>
     <span class="n">ds_new</span> <span class="o">=</span> <span class="n">da_temp</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
@@ -380,42 +380,42 @@
 <div class="viewcode-block" id="ds_add_prec_rain_snow">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.dataset.ds_add_prec_rain_snow">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ds_add_prec_rain_snow</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute total precipitation and add it to the dataset. Sums convective and large-scale precipitation (full-sky and clear-sky) components into a single rainfall variable.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        ds (xarray.Dataset): Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.</span>
+<span class="sd">        ds (xarray.Dataset): Input dataset with an added ``PRECT``, ``snow``, and ``rain`` variable representing total precipitation, snow, and rainfall rates.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        These are all rates that are being used/calculated.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Validation check</span>
-    <span class="n">required_precip_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECSC&#39;</span><span class="p">,</span> <span class="s1">&#39;PRECSL&#39;</span><span class="p">]</span>
+    <span class="n">required_precip_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'PRECC'</span><span class="p">,</span> <span class="s1">'PRECL'</span><span class="p">,</span> <span class="s1">'PRECSC'</span><span class="p">,</span> <span class="s1">'PRECSL'</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">required_precip_vars</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for the calculations.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for the calculations."</span><span class="p">)</span>
 
     <span class="c1"># Total precipitation = convective + large-scale precipitation</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECL&#39;</span><span class="p">]</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECT'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECC'</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECL'</span><span class="p">]</span>
 
     <span class="c1"># Total snowfall = convective + large-scale snowfall</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSC&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSL&#39;</span><span class="p">]</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'snow'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECSC'</span><span class="p">]</span> <span class="o">+</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECSL'</span><span class="p">]</span>
 
     <span class="c1"># Total rainfall = total precipitation - total snowfall</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'rain'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECT'</span><span class="p">]</span> <span class="o">-</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'snow'</span><span class="p">]</span>
 
     <span class="c1"># Copy the metadata attributes</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECSC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECC&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECT'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECC'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'snow'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECSC'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'rain'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECC'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="c1"># Update the &#39;long_name&#39; so the plot titles are accurate</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;PRECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Precipitation Rate&#39;</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;snow&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Snowfall Rate (Water Equivalent)&#39;</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;rain&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Total Rainfall Rate&#39;</span>
+    <span class="c1"># Update the 'long_name' so the plot titles are accurate</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'PRECT'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'long_name'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Total Precipitation Rate'</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'snow'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'long_name'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Total Snowfall Rate (Water Equivalent)'</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'rain'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'long_name'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Total Rainfall Rate'</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 
@@ -423,7 +423,7 @@
 <div class="viewcode-block" id="ds_add_alb">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.dataset.ds_add_alb">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ds_add_alb</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Add surface and top-of-atmosphere albedo variables to a dataset.</span>
 
 <span class="sd">    Computes full-sky and clear-sky albedo at both the surface and the</span>
@@ -440,24 +440,24 @@
 <span class="sd">            * ``albedo_sfc_clearsky``: Surface albedo under clear-sky conditions.</span>
 <span class="sd">            * ``albedo_toa_fullsky``: TOA albedo under all-sky conditions.</span>
 <span class="sd">            * ``albedo_toa_clearsky``: TOA albedo under clear-sky conditions.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Validation check</span>
-    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;FSDS&#39;</span><span class="p">,</span> <span class="s1">&#39;FSNS&#39;</span><span class="p">,</span> <span class="s1">&#39;FSDSC&#39;</span><span class="p">,</span> <span class="s1">&#39;FSNSC&#39;</span><span class="p">,</span> <span class="s1">&#39;SOLIN&#39;</span><span class="p">,</span> <span class="s1">&#39;FSNT&#39;</span><span class="p">,</span> <span class="s1">&#39;FSNTC&#39;</span><span class="p">]</span>
+    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'FSDS'</span><span class="p">,</span> <span class="s1">'FSNS'</span><span class="p">,</span> <span class="s1">'FSDSC'</span><span class="p">,</span> <span class="s1">'FSNSC'</span><span class="p">,</span> <span class="s1">'SOLIN'</span><span class="p">,</span> <span class="s1">'FSNT'</span><span class="p">,</span> <span class="s1">'FSNTC'</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for albedo calculations.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset must contain </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> for albedo calculations."</span><span class="p">)</span>
         
     <span class="c1"># Compute surface albedo using all-sky shortwave fluxes.</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;albedo_sfc_fullsky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSDS&#39;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSNS&#39;</span><span class="p">])</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'albedo_sfc_fullsky'</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">'FSDS'</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'FSNS'</span><span class="p">])</span>
 
     <span class="c1"># Compute surface albedo using clear-sky shortwave fluxes.</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;albedo_sfc_clearsky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSDSC&#39;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSNSC&#39;</span><span class="p">])</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'albedo_sfc_clearsky'</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">'FSDSC'</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'FSNSC'</span><span class="p">])</span>
 
     <span class="c1"># Compute TOA albedo using all-sky shortwave fluxes.</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;albedo_toa_fullsky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;SOLIN&#39;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSNT&#39;</span><span class="p">])</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'albedo_toa_fullsky'</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">'SOLIN'</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'FSNT'</span><span class="p">])</span>
 
     <span class="c1"># Compute TOA albedo using clear-sky shortwave fluxes.</span>
-    <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;albedo_toa_clearsky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;SOLIN&#39;</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;FSNTC&#39;</span><span class="p">])</span>
+    <span class="n">ds</span><span class="p">[</span><span class="s1">'albedo_toa_clearsky'</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedo</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">'SOLIN'</span><span class="p">],</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'FSNTC'</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 
@@ -490,8 +490,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -525,7 +525,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

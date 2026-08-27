@@ -26,17 +26,17 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
     <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -304,9 +304,9 @@
                 <article class="bd-article">
                   
   <h1>Source code for climate_lib.utils</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">This module contains helper functions for climateLib, can also be imported/used for other purposes.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="c1"># import modules</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -332,17 +332,17 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Interpolation point out of data bounds encountered&quot;</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">".*multiple fill values.*"</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">"Interpolation point out of data bounds encountered"</span><span class="p">)</span>
 
 <div class="viewcode-block" id="vertically_interpolate">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.vertically_interpolate">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">vertically_interpolate</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vertically_interpolate</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span> <span class="o">=</span> <span class="s1">'linear'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Vertically interpolate a variable from hybrid sigma-pressure coordinates to specified pressure levels.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        varname (str): Name of the variable to interpolate (e.g., &#39;T&#39;, &#39;U&#39;, &#39;V&#39;).</span>
+<span class="sd">        varname (str): Name of the variable to interpolate (e.g., 'T', 'U', 'V').</span>
 <span class="sd">        ds_ctrl (xarray.Dataset): Original dataset containing the variable in hybrid coordinates.</span>
 <span class="sd">        pnew (array-like): New pressure levels to interpolate to (in hPa).</span>
 <span class="sd">        PS (xarray.DataArray): Surface pressure variable from the dataset.</span>
@@ -352,22 +352,22 @@
 <span class="sd">        </span>
 <span class="sd">    Returns:</span>
 <span class="sd">        var_ctrl_out (xarray.DataArray): The variable interpolated to the new pressure levels, with dimensions (time, lev, lat, lon).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">var_ctrl</span> <span class="o">=</span> <span class="n">ds_ctrl</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>  <span class="c1"># (time:30, lev:30, lat:192, lon:288)</span>
     <span class="c1"># Vertical interpolation</span>
-    <span class="n">var_ctrl_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">pnew</span><span class="p">),</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds_ctrl</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+    <span class="n">var_ctrl_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">pnew</span><span class="p">),</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="s1">'nan'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds_ctrl</span><span class="p">[</span><span class="s1">'time'</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
         <span class="c1"># try with geocat instead of ngl</span>
        <span class="n">var_ctrl_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:,:]</span> <span class="o">=</span> <span class="n">geocat</span><span class="o">.</span><span class="n">comp</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">interp_hybrid_to_pressure</span><span class="p">(</span><span class="n">var_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> 
                                     <span class="n">PS</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hyam_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hybm_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">p0</span><span class="o">=</span><span class="n">P0pa_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                     <span class="n">new_levels</span><span class="o">=</span><span class="n">pnew</span><span class="p">,</span> 
-                                    <span class="n">lev_dim</span><span class="o">=</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span> 
+                                    <span class="n">lev_dim</span><span class="o">=</span><span class="s1">'lev'</span><span class="p">,</span> 
                                     <span class="n">method</span><span class="o">=</span><span class="n">interpolate_method</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_bot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_sfc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     
     <span class="n">var_ctrl_out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">var_ctrl_tmp</span><span class="p">,</span> 
-                          <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> 
-                          <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s1">&#39;lev&#39;</span><span class="p">:</span><span class="n">pnew</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lon</span><span class="p">},</span> 
-                          <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">units</span><span class="p">})</span>
+                          <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">'time'</span><span class="p">,</span><span class="s1">'lev'</span><span class="p">,</span><span class="s1">'lat'</span><span class="p">,</span><span class="s1">'lon'</span><span class="p">],</span> 
+                          <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">'time'</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s1">'lev'</span><span class="p">:</span><span class="n">pnew</span><span class="p">,</span> <span class="s1">'lat'</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="s1">'lon'</span><span class="p">:</span><span class="n">var_ctrl</span><span class="o">.</span><span class="n">lon</span><span class="p">},</span> 
+                          <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">'long_name'</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">long_name</span><span class="p">,</span> <span class="s1">'units'</span><span class="p">:</span> <span class="n">var_ctrl</span><span class="o">.</span><span class="n">units</span><span class="p">})</span>
 
     <span class="k">return</span> <span class="n">var_ctrl_out</span></div>
 
@@ -375,7 +375,7 @@
 <div class="viewcode-block" id="albedo">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.albedo">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">albedo</span><span class="p">(</span><span class="n">swdn</span><span class="p">,</span> <span class="n">swnet</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute surface albedo from downward and net shortwave radiation.</span>
 
 <span class="sd">    Args:</span>
@@ -384,7 +384,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        alpha(xarray.DataArray or numpy.ndarray): Surface albedo (same type and shape as input arrays).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">swup</span> <span class="o">=</span> <span class="n">swdn</span> <span class="o">-</span> <span class="n">swnet</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">swup</span> <span class="o">/</span> <span class="n">swdn</span>
     <span class="k">return</span> <span class="n">alpha</span></div>
@@ -418,8 +418,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -453,7 +453,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>
