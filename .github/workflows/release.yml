@@ -20,17 +20,24 @@ jobs:
         with:
           python-version: "3.11"
 
-      # 1. Calculate next version and push the Git Tag (without making file commits)
-      - name: Python Semantic Release
-        uses: python-semantic-release/python-semantic-release@v9
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit: "false" # Prevents the bot from creating commits in your branch
+      # 1. Install semantic-release and downgrade the broken dependency locally
+      - name: Install Release Tools
+        run: |
+          pip install python-semantic-release
+          pip install "GitPython<3.1.44"
 
-      # 2. Install Hatch on the actual runner machine
+      # 2. Calculate next version and push the Git Tag using the local installation
+      - name: Python Semantic Release
+        env:
+          # Pass the GitHub Token so semantic-release can push the tag
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          semantic-release -v version --no-commit
+
+      # 3. Install Hatch on the actual runner machine
       - name: Install Build Tools
         run: pip install hatch
 
-      # 3. Build your actual library wheel files
+      # 4. Build your actual library wheel files
       - name: Build Distribution Packages
         run: hatch build
