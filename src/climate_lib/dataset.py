@@ -76,7 +76,7 @@ def ds_add_prec_rain_snow(ds):
         ds (xarray.Dataset): Dataset containing precipitation components: PRECC, PRECL, PRECSC, PRECSL.
     
     Returns:
-        ds (xarray.Dataset): Input dataset with an added ``rain`` variable representing total precipitation.
+        ds (xarray.Dataset): Input dataset with an added ``PRECT``, ``snow``, and ``rain`` variable representing total precipitation, snow, and rainfall rates.
 
     Note:
         These are all rates that are being used/calculated.

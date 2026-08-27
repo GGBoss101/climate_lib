@@ -507,35 +507,55 @@ def means(ds_case, mask, var):
 
     return gm, lm, om
 
-def inferred_heat_transport(energy_in, lat_deg):
-    """
-    Compute inferred northward heat transport from energy imbalance.
-
-    Integrates the zonal-mean net energy imbalance from the South Pole toward the North Pole and converts the result to petawatts (PW).
+def inferred_heat_transport( energy_in, lat_deg ):
+    '''
+    Returns the inferred heat transport (in PW) by integrating the net energy imbalance from pole to pole.
 
     Args:
-        energy_in (xarray.Dataset): Zonal-mean net energy flux entering the atmosphere (W m^-2).
-        lat_deg (xarray.Dataset): Latitude coordinates in degrees.
+        energy_in (xarray): net radiative flux that enters the atmosphere (longitude-averaged)
+        lat_deg (xarray): latitude values of the dictionary
 
     Returns:
-        energy_out (xarray.Dataset): Northward heat transport in petawatts (PW).
-    """
-    # Convert latitude to radians.
+        heat_transport (xarray): total northward heat transport (longitude-averaged)
+    '''
+    # Convert latitude from degrees to radians
     lat_rad = np.deg2rad(lat_deg)
 
-    # Apply cos(latitude) area-weighting.
-    flux_density = np.cos(lat_rad) * energy_in
+    # Radius of Earth in metres
+    earth_radius = 6.371e6
 
-    # Integrate cumulatively from South to North.
-    transport = sp.integrate.cumulative_trapezoid(
-        flux_density,
+    # Latitude weighting based on the area of each latitude band
+    latitude_weights = np.cos(lat_rad)
+
+    # Calculate the global, area-weighted mean energy imbalance
+    weighted_energy = energy_in * latitude_weights
+    global_mean_energy = weighted_energy.sum() / latitude_weights.sum()
+
+    # Remove the global mean so that the total energy imbalance
+    # integrates to zero from pole to pole
+    corrected_energy = energy_in - global_mean_energy
+
+    # Weight the corrected energy imbalance by latitude
+    weighted_corrected_energy = latitude_weights * corrected_energy
+
+    # Integrate the energy imbalance from the South Pole northward
+    cumulative_energy = integrate.cumtrapz(
+        weighted_corrected_energy,
         x=lat_rad,
-        initial=0.0
+        initial=0.
     )
 
-    # Convert from W to PW and scale by the Earth's surface geometry.
-    energy_out = 1e-15 * 2 * np.pi * (R_earth**2) * transport
-    return energy_out
+    # Convert the integrated energy into northward heat transport
+    # and convert from watts to petawatts
+    heat_transport = (
+        1E-15
+        * 2
+        * np.pi
+        * earth_radius**2
+        * cumulative_energy
+    )
+
+    return heat_transport
 
 def humidsat(t, p):
     """Compute saturation humidity quantities from temperature and pressure.
