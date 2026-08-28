@@ -41,6 +41,14 @@ climate\_lib.dataset module
    :show-inheritance:
    :undoc-members:
 
+climate\_lib.kernels module
+---------------------------
+
+.. automodule:: climate_lib.kernels
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 climate\_lib.plotting module
 ----------------------------
 
