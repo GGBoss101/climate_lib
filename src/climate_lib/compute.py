@@ -26,8 +26,6 @@ import geocat.comp
 from climate_lib.utils import *
 from climate_lib.constants import *
 
-from climate_lib import util
-
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
