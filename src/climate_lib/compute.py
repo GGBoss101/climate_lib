@@ -26,6 +26,8 @@ import geocat.comp
 from climate_lib.utils import *
 from climate_lib.constants import *
 
+from climate_lib import util
+
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
 warnings.filterwarnings("ignore", message="Interpolation point out of data bounds encountered")
@@ -666,3 +668,142 @@ def meridional_streamfunction(ds, lat_name = 'lat',
     psi = integrand.cumsum(dim=lev_name) * (2 * np.pi * a / g) * cos_lat
 
     return psi  # (year, lev, lat)
+
+
+def albedo(swdn, swnet):
+    """Compute albedo from downwelling and net shortwave radiation.
+ 
+    Args:
+        swdn (xarray.DataArray): Downwelling shortwave radiation.
+        swnet (xarray.DataArray): Net (down minus up) shortwave radiation.
+ 
+    Returns:
+        alpha (xarray.DataArray): Albedo, computed as upwelling/downwelling shortwave.
+    """
+    swup = swdn - swnet
+    alpha = swup / swdn
+    return alpha
+ 
+ 
+def multi_apply_along_axis(func1d, axis, arrs, *args, **kwargs):
+    """Apply a function that takes multiple 1-D arrays along a shared axis of N-D arrays.
+ 
+    Given a function ``func1d(A, B, C, ..., *args, **kwargs)`` that acts on
+    multiple one-dimensional arrays, apply that function to the N-dimensional
+    arrays listed in ``arrs`` along axis ``axis``.
+ 
+    If the arrays in ``arrs`` are one-dimensional this is equivalent to
+    ``func1d(*arrs, *args, **kwargs)``. If there is only one array in
+    ``arrs`` this is equivalent to
+    ``numpy.apply_along_axis(func1d, axis, arrs[0], *args, **kwargs)``.
+    All arrays in ``arrs`` must have compatible dimensions to be able to run
+    ``numpy.concatenate(arrs, axis)``.
+ 
+    Source: https://climate-cms.org/2019/07/29/multi-apply-along-axis.html
+ 
+    Args:
+        func1d (callable): Function operating on ``len(arrs)`` 1-D arrays, with signature ``f(*arrs, *args, **kwargs)``.
+        axis (int): Axis of all arrays in ``arrs`` to apply the function along.
+        arrs (iterable of numpy.ndarray): Arrays to operate on, concatenated internally along ``axis``.
+        *args: Passed to ``func1d`` after the array arguments.
+        **kwargs: Passed to ``func1d`` as keyword arguments.
+ 
+    Returns:
+        result (numpy.ndarray): Output of applying ``func1d`` along ``axis`` across all input arrays.
+    """
+    carrs = np.concatenate(arrs, axis)
+ 
+    offsets = []
+    start = 0
+    for i in range(len(arrs) - 1):
+        start += arrs[i].shape[axis]
+        offsets.append(start)
+ 
+    def helperfunc(a, *args, **kwargs):
+        split_arrs = np.split(a, offsets)
+        return func1d(*[*split_arrs, *args], **kwargs)
+ 
+    return np.apply_along_axis(helperfunc, axis, carrs, *args, **kwargs)
+ 
+ 
+def humidsat(t, p):
+    """Compute saturation vapor pressure, specific humidity, and mixing ratio.
+ 
+    Uses the modified Tetens-like formulae of Buck (1981, J. Appl. Meteorol.)
+    for vapor pressure over liquid water at temperatures above 0 C, over ice
+    at temperatures below -23 C, and a quadratic polynomial interpolation for
+    intermediate temperatures.
+ 
+    Args:
+        t (xarray.DataArray or numpy.ndarray): Temperature in Kelvin.
+        p (xarray.DataArray or numpy.ndarray): Pressure in hPa.
+ 
+    Returns:
+        esat (xarray.DataArray or numpy.ndarray): Saturation vapor pressure (hPa).
+        qsat (xarray.DataArray or numpy.ndarray): Saturation specific humidity (kg/kg).
+        rsat (xarray.DataArray or numpy.ndarray): Saturation mixing ratio (kg/kg).
+    """
+    tc = t - 273.16
+    tice = -23
+    t0 = 0
+    Rd = 287.04
+    Rv = 461.5
+    epsilon = Rd / Rv
+ 
+    ewat = (1.0007 + (3.46e-6 * p)) * 6.1121 * np.exp(17.502 * tc / (240.97 + tc))
+    eice = (1.0003 + (4.18e-6 * p)) * 6.1115 * np.exp(22.452 * tc / (272.55 + tc))
+    eint = eice + (ewat - eice) * ((tc - tice) / (t0 - tice)) ** 2
+ 
+    esat = eice.where(tc < tice, eint)
+    esat = ewat.where(tc > t0, esat)
+ 
+    rsat = epsilon * esat / (p - esat)
+    qsat = epsilon * esat / (p - esat * (1 - epsilon))
+    return esat, qsat, rsat
+ 
+ 
+def vert_integral_layer_sum(ds, var, ilev_var="ilev", g=g_earth, pressure_factor=100.0):
+    """Vertically integrate a variable by summing over layer thickness (mass-weighted).
+ 
+    Uses layer interface pressures (``ilev``) to compute per-layer thickness
+    ``dp`` and sums ``var * dp / g`` over the vertical dimension. This is
+    dimension-order agnostic (unlike a manual roll-axis implementation) and
+    works for both 3-D (lev, lat, lon) and 4-D (time, lev, lat, lon) inputs.
+ 
+    Args:
+        ds (xarray.Dataset): Input dataset containing ``var`` and the interface-level coordinate ``ilev_var``.
+        var (str): Name of the variable in ``ds`` to integrate; must have a ``lev`` dimension.
+        ilev_var (str): Name of the layer-interface pressure coordinate (default: "ilev").
+        g (float): Gravitational acceleration in m/s^2 (default: 9.80665).
+        pressure_factor (float): Multiplier to convert ``ilev_var`` units to Pascals (default: 100.0 for hPa -> Pa).
+ 
+    Returns:
+        integral (xarray.DataArray): Column integral of ``var``, with the ``lev`` dimension removed.
+    """
+    if var not in ds:
+        raise ValueError(f"Variable '{var}' not found in the dataset.")
+    if "lev" not in ds[var].dims:
+        raise ValueError("Variable must have a 'lev' dimension for vertical integration.")
+ 
+    p_interfaces = ds[ilev_var] * pressure_factor
+    dp = p_interfaces.diff(ilev_var)
+    dp = dp.rename({ilev_var: "lev"}).assign_coords(lev=ds["lev"].values)
+ 
+    integral = (ds[var] * dp).sum("lev") / g
+    return integral
+ 
+ 
+def gaussian_area_weights(gw, nlon):
+    """Build a normalized 2-D (lat, lon) area-weighting matrix from 1-D Gaussian latitude weights.
+ 
+    Args:
+        gw (numpy.ndarray or xarray.DataArray): 1-D Gaussian latitude weights, length nlat.
+        nlon (int): Number of longitude points to tile the weights across.
+ 
+    Returns:
+        weight (numpy.ndarray): 2-D (lat, lon) array of area weights, normalized to sum to 1.
+    """
+    weight = np.transpose(np.tile(gw, [nlon, 1]))
+    weight = weight / np.nansum(weight)
+    return weight
+ 

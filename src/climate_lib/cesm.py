@@ -4,7 +4,6 @@ This module contains functions concerning CESM datasets.
 
 import sys
 
-# netcdf/numpy/xarray
 import numpy as np
 import netCDF4 as nc
 import numpy.matlib
@@ -22,14 +21,13 @@ import scipy as sp
 import pandas as pd
 
 import time
+import cftime
 
 from copy import copy 
 
-# Plotting
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-# OS interaction
 import os
 import sys
 import cftime
@@ -39,7 +37,6 @@ import glob
 import cartopy.crs as ccrs
 from cartopy.util import add_cyclic_point
 
-import glob
 import dask
 import dask.bag as db
 
@@ -122,42 +119,61 @@ def modify_cesm(ds_old, var_list, zeros = None, global_mean = None, simple_zonal
 
     return ds_zeros, ds_mean_new, ds_zonal_new, ds_mirror_zonal_new
 
-
-def cesm_time(ds, y_start, y_end):
-    """
-    Adjust CESM time coordinates and restrict data to years y_start to y_end.
-
-    CESM monthly output timestamps are shifted 15 days backward so that
-    each timestamp aligns with the month represented by the data. After
-    adjusting the time coordinate, all records outside simulation years
-    y_start to y_end are removed.
-
+ 
+def align_and_filter_time(ds, day_shift=15, year_range=None, time_var="time"):
+    """Shift CESM monthly-average timestamps and optionally drop years outside a range.
+ 
+    CESM monthly time coordinates are stamped at the end of the averaging
+    period, so a small backward shift (commonly 15 days) is needed to line
+    the timestamp up with the month the data actually represents. Decoded
+    cftime objects are produced from the raw numeric time values so this
+    should be called on a dataset opened with ``decode_times=False``.
+ 
     Args:
-        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.
-        y_start (int): Starting year for the simulation period.
-        y_end (int): Ending year for the simulation period.
-
+        ds (xarray.Dataset): Input dataset with a raw (non-decoded) numeric time coordinate.
+        day_shift (float): Number of days to subtract from the raw time values before decoding (default: 15).
+        year_range (range or None): If given, keep only timesteps whose decoded year falls in this range (optional).
+        time_var (str): Name of the time coordinate/variable (default: "time").
+ 
     Returns:
-        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years y_start to y_end retained.
-
-    Notes:
-        The 15-day offset is applied to align monthly averages with the
-        calendar month they represent. Data from years before y_start or after
-        y_end are dropped.
+        ds (xarray.Dataset): Dataset with decoded, shifted time coordinates, optionally filtered to ``year_range``.
     """
-    # Shift timestamps backward by 15 days to align monthly means with
-    # the calendar month represented by the data.
-    time2 = cftime.num2date(
-        ds['time'].values[:] - 15,
-        units=ds['time'].units,
-        calendar=ds['time'].calendar,
-        only_use_cftime_datetimes = True,
+    time_new = cftime.num2date(
+        ds[time_var].values[:] - day_shift,
+        units=ds[time_var].units,
+        calendar=ds[time_var].calendar,
+        only_use_cftime_datetimes=True,
     )
-
-    # Replace the dataset's time coordinate with the adjusted timestamps.
-    ds = ds.assign_coords({'time': time2})
-
-    # Retain only years y_start to y_end of the simulation.
-    ds = ds.where(ds['time'].dt.year.isin(range(y_start, y_end + 1)), drop=True)
-
+    ds = ds.assign_coords({time_var: time_new})
+    if year_range is not None:
+        ds = ds.where(ds[time_var].dt.year.isin(year_range), drop=True)
     return ds
+ 
+ 
+def build_cesm_filelist(archive_path, run_name, variables, component="atm",
+                         stream="cam.h0", proc_subdir="atm/proc/tseries/month_1"):
+    """Glob together per-variable CESM time-series output files for one run.
+ 
+    CESM/CAM post-processed time series are typically stored one file per
+    variable, named like ``<run_name>.<stream>.<VAR>.<dates>.nc``. This
+    walks a list of variable names and collects all matching files, sorted,
+    into a single flat list suitable for ``xarray.open_mfdataset``.
+ 
+    Args:
+        archive_path (str): Root archive directory containing the run's output.
+        run_name (str): CESM case/run name, used both as a subdirectory and filename prefix.
+        variables (list of str): Variable names to search for.
+        component (str): Model component subdirectory, e.g. "atm" or "lnd" (default: "atm"); informational, use ``proc_subdir`` for the actual path.
+        stream (str): Output stream identifier used in filenames, e.g. "cam.h0" or "clm2.h0" (default: "cam.h0").
+        proc_subdir (str): Path (relative to ``archive_path/run_name/``) to the post-processed time-series directory (default: "atm/proc/tseries/month_1").
+ 
+    Returns:
+        filelist (list of str): Sorted list of file paths matching all requested variables.
+    """
+    folder = os.path.join(archive_path, run_name, proc_subdir)
+    filelist = []
+    for var in variables:
+        pattern = os.path.join(folder, f"{run_name}.{stream}.{var}.*.nc")
+        files = sorted(glob.glob(pattern))
+        filelist.extend(files)
+    return filelist

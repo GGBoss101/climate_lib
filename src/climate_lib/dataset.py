@@ -26,6 +26,7 @@ import geocat.comp
 
 from climate_lib.utils import *
 from climate_lib.constants import *
+from climate_lib.compute import *
 
 import warnings
 warnings.filterwarnings("ignore", message=".*multiple fill values.*")
@@ -108,41 +109,117 @@ def ds_add_prec_rain_snow(ds):
 
     return ds
 
-def ds_add_alb(ds):
-    """
-    Add surface and top-of-atmosphere albedo variables to a dataset.
-
-    Computes full-sky and clear-sky albedo at both the surface and the
-    top of the atmosphere (TOA) using the ``albedo`` helper function, and
-    stores the results as new variables in the dataset.
-
+def add_albedo_variables(ds, pairs):
+    """Add one or more albedo variables to a dataset from downwelling/net SW pairs.
+ 
     Args:
-        ds (xarray.Dataset): Dataset containing the radiation variables required for albedo calculations: ``FSDS``, ``FSNS``, ``FSDSC``, ``FSNSC``, ``SOLIN``, ``FSNT``, and ``FSNTC``.
-
+        ds (xarray.Dataset): Input dataset containing the shortwave flux variables.
+        pairs (dict): Mapping of ``{output_var_name: (swdn_var_name, swnet_var_name)}``, e.g. ``{"albedo_sfc_fullsky": ("FSDS", "FSNS")}``.
+ 
     Returns:
-        ds (xarray.Dataset): The input dataset with the following additional variables:
-
-            * ``albedo_sfc_fullsky``: Surface albedo under all-sky conditions.
-            * ``albedo_sfc_clearsky``: Surface albedo under clear-sky conditions.
-            * ``albedo_toa_fullsky``: TOA albedo under all-sky conditions.
-            * ``albedo_toa_clearsky``: TOA albedo under clear-sky conditions.
+        ds (xarray.Dataset): Dataset with the requested albedo variables added.
     """
-    # Validation check
-    vars = ['FSDS', 'FSNS', 'FSDSC', 'FSNSC', 'SOLIN', 'FSNT', 'FSNTC']
-    for var in vars:
-        if var not in ds:
-            raise ValueError(f"Dataset must contain {var} for albedo calculations.")
-        
-    # Compute surface albedo using all-sky shortwave fluxes.
-    ds['albedo_sfc_fullsky'] = albedo(ds['FSDS'], ds['FSNS'])
-
-    # Compute surface albedo using clear-sky shortwave fluxes.
-    ds['albedo_sfc_clearsky'] = albedo(ds['FSDSC'], ds['FSNSC'])
-
-    # Compute TOA albedo using all-sky shortwave fluxes.
-    ds['albedo_toa_fullsky'] = albedo(ds['SOLIN'], ds['FSNT'])
-
-    # Compute TOA albedo using clear-sky shortwave fluxes.
-    ds['albedo_toa_clearsky'] = albedo(ds['SOLIN'], ds['FSNTC'])
-
+    for out_name, (swdn_var, swnet_var) in pairs.items():
+        ds[out_name] = albedo(ds[swdn_var], ds[swnet_var])
     return ds
+ 
+ 
+def sum_variables(ds, components, out_name):
+    """Sum several variables in a dataset into a single new variable.
+ 
+    Useful for things like combining convective/large-scale, liquid/solid
+    precipitation components into one "total precipitation" variable.
+ 
+    Args:
+        ds (xarray.Dataset): Input dataset containing the component variables.
+        components (list of str): Names of variables in ``ds`` to sum together.
+        out_name (str): Name of the new summed variable to add to ``ds``.
+ 
+    Returns:
+        ds (xarray.Dataset): Dataset with the new summed variable added.
+    """
+    total = ds[components[0]]
+    for var in components[1:]:
+        total = total + ds[var]
+    ds[out_name] = total
+    return ds
+ 
+ 
+def unstack_time_to_year_month(ds, variables=None, year_dim="year", month_dim="month"):
+    """Reshape a monthly time-series dataset from a single 'time' dimension into (year, month).
+ 
+    Builds a year/month MultiIndex from the dataset's decoded time
+    coordinate and unstacks each requested variable individually before
+    remerging, since ``unstack`` only works cleanly one DataArray at a time
+    for this pattern.
+ 
+    Args:
+        ds (xarray.Dataset): Input dataset with a decoded 'time' dimension covering whole years of monthly data.
+        variables (list of str or None): Variables to reshape; if None, reshapes every data variable in ``ds``.
+        year_dim (str): Name to give the new year dimension (default: "year").
+        month_dim (str): Name to give the new month dimension (default: "month").
+ 
+    Returns:
+        ds_out (xarray.Dataset): Dataset with 'time' replaced by separate (year, month) dimensions.
+    """
+    years = ds.groupby("time.year").mean("time").year
+    months = ds.groupby("time.month").mean("time").month
+ 
+    midx = pd.MultiIndex.from_product([years.values, months.values], names=(year_dim, month_dim))
+ 
+    var_list = variables if variables is not None else list(ds.data_vars)
+ 
+    da_list = []
+    for var in var_list:
+        da_temp = ds[var].copy()
+        da_temp = da_temp.assign_coords({"time": midx})
+        da_list.append(da_temp.unstack().to_dataset(name=var))
+ 
+    ds_out = xr.merge(da_list)
+    return ds_out
+ 
+ 
+def annotate_dataarray(da, name, longname, title, pos_dir, units, full_units):
+    """Attach standard metadata attributes to a DataArray and wrap it in a named Dataset.
+ 
+    Args:
+        da (xarray.DataArray): Field to annotate and export.
+        name (str): Variable name to use in the output Dataset.
+        longname (str): Human-readable long description of the variable.
+        title (str): Short plot-friendly title for the variable.
+        pos_dir (str): Sign convention description, e.g. "up" or "down".
+        units (str): Units string, e.g. "W/m2".
+        full_units (str): Fuller description of the quantity and its units, e.g. "Delta TOA SW".
+ 
+    Returns:
+        ds_new (xarray.Dataset): Single-variable Dataset named ``name`` with the given attributes attached.
+    """
+    da = da.copy()
+    da.attrs["units"] = units
+    da.attrs["longname"] = longname
+    da.attrs["positive_dir"] = pos_dir
+    da.attrs["title"] = title
+    da.attrs["full_units"] = full_units
+    return da.to_dataset(name=name)
+ 
+ 
+def write_netcdf(ds, filename, overwrite=True, make_dirs=True):
+    """Write a Dataset to a netCDF file, optionally overwriting and creating parent directories.
+ 
+    Args:
+        ds (xarray.Dataset): Dataset to write out.
+        filename (str): Destination file path.
+        overwrite (bool): If True, delete any existing file at ``filename`` before writing (default: True).
+        make_dirs (bool): If True, create the parent directory of ``filename`` if it doesn't exist (default: True).
+ 
+    Returns:
+        filename (str): The path the dataset was written to.
+    """
+    if make_dirs:
+        parent = os.path.dirname(filename)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+    if overwrite and os.path.exists(filename):
+        os.remove(filename)
+    ds.to_netcdf(path=filename, mode="w")
+    return filename
