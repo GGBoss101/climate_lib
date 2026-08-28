@@ -135,3 +135,40 @@ def NA_map(mapdata, cmap, clim, units="", title=""):
     plt.show()
 
     return fig, ax
+
+def zonal_mean_spread(da, avg_dims=("month", "year"), lon_dim="lon", spread_dim="year", spread_stat="std"):
+    """Compute a zonal (longitude) mean profile and a spread band across another dimension.
+ 
+    Averages ``da`` over ``avg_dims`` and ``lon_dim`` to get a zonal-mean
+    latitude profile, and separately computes the spread (e.g. inter-annual
+    standard deviation) across ``spread_dim`` after averaging over
+    longitude, for use as a shaded uncertainty band in latitude-profile plots.
+ 
+    Args:
+        da (xarray.DataArray): Field with at least latitude, longitude, and ``spread_dim`` dimensions.
+        avg_dims (tuple of str): Dimensions to average over for the central estimate (default: ("month", "year")).
+        lon_dim (str): Name of the longitude dimension (default: "lon").
+        spread_dim (str): Dimension across which to compute the spread statistic, e.g. "year" (default: "year").
+        spread_stat (str): Spread statistic to compute; one of "std" or "sem" (default: "std").
+ 
+    Returns:
+        mean_profile (xarray.DataArray): Latitude profile averaged over ``avg_dims`` and ``lon_dim``.
+        spread_profile (xarray.DataArray): Latitude profile of the requested spread statistic, computed over ``spread_dim`` after averaging over ``lon_dim``.
+    """
+    mean_profile = da.mean(list(avg_dims))
+    if lon_dim not in avg_dims:
+        mean_profile = mean_profile.mean(lon_dim)
+ 
+    lon_avgd = da.mean(lon_dim)
+    remaining_avg_dims = [d for d in avg_dims if d != spread_dim]
+    if remaining_avg_dims:
+        lon_avgd = lon_avgd.mean(remaining_avg_dims)
+ 
+    if spread_stat == "std":
+        spread_profile = lon_avgd.std(spread_dim)
+    elif spread_stat == "sem":
+        spread_profile = lon_avgd.std(spread_dim) / np.sqrt(lon_avgd.sizes[spread_dim])
+    else:
+        raise ValueError(f"Unknown spread_stat '{spread_stat}'; expected 'std' or 'sem'.")
+ 
+    return mean_profile, spread_profile

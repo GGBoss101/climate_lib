@@ -3,6 +3,7 @@ This module contains helper functions for climateLib, can also be imported/used 
 """
 
 # import modules
+from climate_lib.compute import humidsat
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -77,3 +78,42 @@ def albedo(swdn, swnet):
     swup = swdn - swnet
     alpha = swup / swdn
     return alpha
+
+def mask_above_tropopause(da, p, p_tropopause):
+    """Zero out (mask) values above a given tropopause pressure surface.
+ 
+    Sets values to NaN wherever the pressure ``p`` is above (i.e. less than)
+    the local tropopause pressure, so stratospheric temperature/moisture
+    changes don't contaminate a tropospheric kernel convolution.
+ 
+    Args:
+        da (xarray.DataArray): Field to mask (e.g. a temperature or moisture change), with a 'lev' dimension.
+        p (xarray.DataArray): Pressure field broadcastable against ``da``, in the same units as ``p_tropopause``.
+        p_tropopause (xarray.DataArray): Tropopause pressure field (e.g. from ``kernels.estimate_diagnostic_tropopause``, broadcast to match ``p``).
+ 
+    Returns:
+        da_masked (xarray.DataArray): ``da`` with values above the tropopause set to NaN.
+    """
+    return da.where(p >= p_tropopause)
+ 
+ 
+def logq_kernel_normalization(t0, dt, p):
+    """Compute d(log qsat)/dT, used to normalize a moisture kernel onto a log-q basis.
+ 
+    Normalizing the water-vapour radiative kernel by the change in
+    saturation specific humidity expected for a 1 K warming at constant
+    relative humidity ("log-q kernel") makes the moisture feedback
+    decomposition insensitive to the model's climatological humidity field.
+ 
+    Args:
+        t0 (xarray.DataArray): Baseline (control) temperature in Kelvin.
+        dt (xarray.DataArray): Temperature change (case minus control) in Kelvin.
+        p (xarray.DataArray): Pressure in hPa, broadcastable against ``t0``.
+ 
+    Returns:
+        dlogqdt (xarray.DataArray): d(log qsat)/dT, the moisture kernel normalization factor.
+    """
+    _, qsat1, _ = humidsat(t0, p)
+    _, qsat2, _ = humidsat(t0 + dt, p)
+    dlogqdt = (np.log(qsat2) - np.log(qsat1)) / dt
+    return dlogqdt
