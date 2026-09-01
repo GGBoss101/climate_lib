@@ -5,15 +5,16 @@ Attributes:
     g_earth (float): Earth's gravitational acceleration (m/s^2)
     R_earth (float): Earth's radius (m)
     P0pa (float): Standard pressure at sea level (Pa)
-    conversion_factors (dict): Dictionary of unit conversion factors
-        - "hPa_to_Pa": Conversion factor from hectopascals to pascals
-        - "Pa_to_hPa": Conversion factor from pascals to hectopascals
-        - "K_to_C": Conversion factor from Kelvin to Celsius
-        - "C_to_K": Conversion factor from Celsius to Kelvin
-        - "m_to_km": Conversion factor from meters to kilometers
-        - "km_to_m": Conversion factor from kilometers to meters
-        - "s_to_hr": Conversion factor from seconds to hours
-        - "hr_to_s": Conversion factor from hours to seconds
+    conversion_factors (dict): Dictionary of unit conversion factors.
+
+        * **"hPa_to_Pa"**: Conversion factor from hectopascals to pascals
+        * **"Pa_to_hPa"**: Conversion factor from pascals to hectopascals
+        * **"K_to_C"**: Conversion factor from Kelvin to Celsius
+        * **"C_to_K"**: Conversion factor from Celsius to Kelvin
+        * **"m_to_km"**: Conversion factor from meters to kilometers
+        * **"km_to_m"**: Conversion factor from kilometers to meters
+        * **"s_to_hr"**: Conversion factor from seconds to hours
+        * **"hr_to_s"**: Conversion factor from hours to seconds
 """
 
 # Earth's gravitational acceleration (m/s^2)

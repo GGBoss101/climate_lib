@@ -30,7 +30,7 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=a51c3844" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -330,6 +330,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">geocat.comp</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
@@ -445,6 +446,46 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="zonal_mean_spread">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.plotting.zonal_mean_spread">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zonal_mean_spread</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">avg_dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">),</span> <span class="n">lon_dim</span><span class="o">=</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="n">spread_dim</span><span class="o">=</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="n">spread_stat</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a zonal (longitude) mean profile and a spread band across another dimension.</span>
+<span class="sd"> </span>
+<span class="sd">    Averages ``da`` over ``avg_dims`` and ``lon_dim`` to get a zonal-mean</span>
+<span class="sd">    latitude profile, and separately computes the spread (e.g. inter-annual</span>
+<span class="sd">    standard deviation) across ``spread_dim`` after averaging over</span>
+<span class="sd">    longitude, for use as a shaded uncertainty band in latitude-profile plots.</span>
+<span class="sd"> </span>
+<span class="sd">    Args:</span>
+<span class="sd">        da (xarray.DataArray): Field with at least latitude, longitude, and ``spread_dim`` dimensions.</span>
+<span class="sd">        avg_dims (tuple of str): Dimensions to average over for the central estimate (default: (&quot;month&quot;, &quot;year&quot;)).</span>
+<span class="sd">        lon_dim (str): Name of the longitude dimension (default: &quot;lon&quot;).</span>
+<span class="sd">        spread_dim (str): Dimension across which to compute the spread statistic, e.g. &quot;year&quot; (default: &quot;year&quot;).</span>
+<span class="sd">        spread_stat (str): Spread statistic to compute; one of &quot;std&quot; or &quot;sem&quot; (default: &quot;std&quot;).</span>
+<span class="sd"> </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        mean_profile (xarray.DataArray): Latitude profile averaged over ``avg_dims`` and ``lon_dim``.</span>
+<span class="sd">        spread_profile (xarray.DataArray): Latitude profile of the requested spread statistic, computed over ``spread_dim`` after averaging over ``lon_dim``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_profile</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">avg_dims</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">lon_dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">avg_dims</span><span class="p">:</span>
+        <span class="n">mean_profile</span> <span class="o">=</span> <span class="n">mean_profile</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lon_dim</span><span class="p">)</span>
+ 
+    <span class="n">lon_avgd</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lon_dim</span><span class="p">)</span>
+    <span class="n">remaining_avg_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">avg_dims</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="n">spread_dim</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">remaining_avg_dims</span><span class="p">:</span>
+        <span class="n">lon_avgd</span> <span class="o">=</span> <span class="n">lon_avgd</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">remaining_avg_dims</span><span class="p">)</span>
+ 
+    <span class="k">if</span> <span class="n">spread_stat</span> <span class="o">==</span> <span class="s2">&quot;std&quot;</span><span class="p">:</span>
+        <span class="n">spread_profile</span> <span class="o">=</span> <span class="n">lon_avgd</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">spread_dim</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">spread_stat</span> <span class="o">==</span> <span class="s2">&quot;sem&quot;</span><span class="p">:</span>
+        <span class="n">spread_profile</span> <span class="o">=</span> <span class="n">lon_avgd</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">spread_dim</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lon_avgd</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">spread_dim</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown spread_stat &#39;</span><span class="si">{</span><span class="n">spread_stat</span><span class="si">}</span><span class="s2">&#39;; expected &#39;std&#39; or &#39;sem&#39;.&quot;</span><span class="p">)</span>
+ 
+    <span class="k">return</span> <span class="n">mean_profile</span><span class="p">,</span> <span class="n">spread_profile</span></div>
 
 </pre></div>
 

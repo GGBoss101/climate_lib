@@ -30,7 +30,7 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=a51c3844" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -309,6 +309,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># import modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.compute</span><span class="w"> </span><span class="kn">import</span> <span class="n">humidsat</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -329,13 +330,15 @@
 <span class="c1"># import Ngl</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">geocat.comp</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">climate_lib.constants</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;.*multiple fill values.*&quot;</span><span class="p">)</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Interpolation point out of data bounds encountered&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="vertically_interpolate">
 <a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.vertically_interpolate">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">vertically_interpolate</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vertically_interpolate</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">ds_ctrl</span><span class="p">,</span> <span class="n">pnew</span><span class="p">,</span> <span class="n">PS</span><span class="p">,</span> <span class="n">hyam_ctrl</span><span class="p">,</span> <span class="n">hybm_ctrl</span><span class="p">,</span> <span class="n">P0pa_ctrl</span><span class="p">,</span> <span class="n">interpolate_method</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Vertically interpolate a variable from hybrid sigma-pressure coordinates to specified pressure levels.</span>
 
@@ -360,7 +363,7 @@
                                     <span class="n">PS</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hyam_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hybm_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">p0</span><span class="o">=</span><span class="n">P0pa_ctrl</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                     <span class="n">new_levels</span><span class="o">=</span><span class="n">pnew</span><span class="p">,</span> 
                                     <span class="n">lev_dim</span><span class="o">=</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span> 
-                                    <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_bot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_sfc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+                                    <span class="n">method</span><span class="o">=</span><span class="n">interpolate_method</span><span class="p">,</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_bot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi_sfc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     
     <span class="n">var_ctrl_out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">var_ctrl_tmp</span><span class="p">,</span> 
                           <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="s1">&#39;lev&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> 
@@ -386,6 +389,51 @@
     <span class="n">swup</span> <span class="o">=</span> <span class="n">swdn</span> <span class="o">-</span> <span class="n">swnet</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="n">swup</span> <span class="o">/</span> <span class="n">swdn</span>
     <span class="k">return</span> <span class="n">alpha</span></div>
+
+
+<div class="viewcode-block" id="mask_above_tropopause">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.mask_above_tropopause">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mask_above_tropopause</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p_tropopause</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Zero out (mask) values above a given tropopause pressure surface.</span>
+<span class="sd"> </span>
+<span class="sd">    Sets values to NaN wherever the pressure ``p`` is above (i.e. less than)</span>
+<span class="sd">    the local tropopause pressure, so stratospheric temperature/moisture</span>
+<span class="sd">    changes don&#39;t contaminate a tropospheric kernel convolution.</span>
+<span class="sd"> </span>
+<span class="sd">    Args:</span>
+<span class="sd">        da (xarray.DataArray): Field to mask (e.g. a temperature or moisture change), with a &#39;lev&#39; dimension.</span>
+<span class="sd">        p (xarray.DataArray): Pressure field broadcastable against ``da``, in the same units as ``p_tropopause``.</span>
+<span class="sd">        p_tropopause (xarray.DataArray): Tropopause pressure field (e.g. from ``kernels.estimate_diagnostic_tropopause``, broadcast to match ``p``).</span>
+<span class="sd"> </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        da_masked (xarray.DataArray): ``da`` with values above the tropopause set to NaN.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">p</span> <span class="o">&gt;=</span> <span class="n">p_tropopause</span><span class="p">)</span></div>
+
+ 
+ 
+<div class="viewcode-block" id="logq_kernel_normalization">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.utils.logq_kernel_normalization">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">logq_kernel_normalization</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute d(log qsat)/dT, used to normalize a moisture kernel onto a log-q basis.</span>
+<span class="sd"> </span>
+<span class="sd">    Normalizing the water-vapour radiative kernel by the change in</span>
+<span class="sd">    saturation specific humidity expected for a 1 K warming at constant</span>
+<span class="sd">    relative humidity (&quot;log-q kernel&quot;) makes the moisture feedback</span>
+<span class="sd">    decomposition insensitive to the model&#39;s climatological humidity field.</span>
+<span class="sd"> </span>
+<span class="sd">    Args:</span>
+<span class="sd">        t0 (xarray.DataArray): Baseline (control) temperature in Kelvin.</span>
+<span class="sd">        dt (xarray.DataArray): Temperature change (case minus control) in Kelvin.</span>
+<span class="sd">        p (xarray.DataArray): Pressure in hPa, broadcastable against ``t0``.</span>
+<span class="sd"> </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dlogqdt (xarray.DataArray): d(log qsat)/dT, the moisture kernel normalization factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">qsat1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">humidsat</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">qsat2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">humidsat</span><span class="p">(</span><span class="n">t0</span> <span class="o">+</span> <span class="n">dt</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">dlogqdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">qsat2</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">qsat1</span><span class="p">))</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="k">return</span> <span class="n">dlogqdt</span></div>
 
 </pre></div>
 

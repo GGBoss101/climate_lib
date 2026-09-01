@@ -30,7 +30,7 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=a51c3844" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=fa783fd2" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
@@ -310,7 +310,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="c1"># netcdf/numpy/xarray</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">netCDF4</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy.matlib</span>
@@ -328,14 +327,13 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span> 
 
-<span class="c1"># Plotting</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="c1"># OS interaction</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">cftime</span>
@@ -345,7 +343,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">cartopy.crs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ccrs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">cartopy.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_cyclic_point</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask.bag</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">db</span>
 
@@ -431,45 +428,69 @@
     <span class="k">return</span> <span class="n">ds_zeros</span><span class="p">,</span> <span class="n">ds_mean_new</span><span class="p">,</span> <span class="n">ds_zonal_new</span><span class="p">,</span> <span class="n">ds_mirror_zonal_new</span></div>
 
 
-
-<div class="viewcode-block" id="cesm_time">
-<a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.cesm_time">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">cesm_time</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Adjust CESM time coordinates and restrict data to years 20–49.</span>
-
-<span class="sd">    CESM monthly output timestamps are shifted 15 days backward so that</span>
-<span class="sd">    each timestamp aligns with the month represented by the data. After</span>
-<span class="sd">    adjusting the time coordinate, all records outside simulation years</span>
-<span class="sd">    20–49 are removed.</span>
-
+ 
+<div class="viewcode-block" id="align_and_filter_time">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.align_and_filter_time">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">align_and_filter_time</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">day_shift</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">year_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_var</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shift CESM monthly-average timestamps and optionally drop years outside a range.</span>
+<span class="sd"> </span>
+<span class="sd">    CESM monthly time coordinates are stamped at the end of the averaging</span>
+<span class="sd">    period, so a small backward shift (commonly 15 days) is needed to line</span>
+<span class="sd">    the timestamp up with the month the data actually represents. Decoded</span>
+<span class="sd">    cftime objects are produced from the raw numeric time values so this</span>
+<span class="sd">    should be called on a dataset opened with ``decode_times=False``.</span>
+<span class="sd"> </span>
 <span class="sd">    Args:</span>
-<span class="sd">        ds (xarray.Dataset): Dataset containing a ``time`` coordinate with valid ``units`` and ``calendar`` attributes compatible with ``cftime.num2date``.</span>
-
+<span class="sd">        ds (xarray.Dataset): Input dataset with a raw (non-decoded) numeric time coordinate.</span>
+<span class="sd">        day_shift (float): Number of days to subtract from the raw time values before decoding (default: 15).</span>
+<span class="sd">        year_range (range or None): If given, keep only timesteps whose decoded year falls in this range (optional).</span>
+<span class="sd">        time_var (str): Name of the time coordinate/variable (default: &quot;time&quot;).</span>
+<span class="sd"> </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        ds (xarray.Dataset): Dataset with corrected time coordinates and only observations from years 20–49 retained.</span>
-
-<span class="sd">    Notes:</span>
-<span class="sd">        The 15-day offset is applied to align monthly averages with the</span>
-<span class="sd">        calendar month they represent. Data from years before 20 or after</span>
-<span class="sd">        49 are dropped.</span>
+<span class="sd">        ds (xarray.Dataset): Dataset with decoded, shifted time coordinates, optionally filtered to ``year_range``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Shift timestamps backward by 15 days to align monthly means with</span>
-    <span class="c1"># the calendar month represented by the data.</span>
-    <span class="n">time2</span> <span class="o">=</span> <span class="n">cftime</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span>
-        <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]</span> <span class="o">-</span> <span class="mi">15</span><span class="p">,</span>
-        <span class="n">units</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
-        <span class="n">calendar</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span>
-        <span class="n">only_use_cftime_datetimes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">time_new</span> <span class="o">=</span> <span class="n">cftime</span><span class="o">.</span><span class="n">num2date</span><span class="p">(</span>
+        <span class="n">ds</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[:]</span> <span class="o">-</span> <span class="n">day_shift</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">,</span>
+        <span class="n">calendar</span><span class="o">=</span><span class="n">ds</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span><span class="o">.</span><span class="n">calendar</span><span class="p">,</span>
+        <span class="n">only_use_cftime_datetimes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="c1"># Replace the dataset&#39;s time coordinate with the adjusted timestamps.</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">time2</span><span class="p">})</span>
-
-    <span class="c1"># Retain only years 20–49 of the simulation.</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">)),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="n">time_var</span><span class="p">:</span> <span class="n">time_new</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">year_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">time_var</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">year_range</span><span class="p">),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ds</span></div>
+
+ 
+ 
+<div class="viewcode-block" id="build_cesm_filelist">
+<a class="viewcode-back" href="../../climate_lib.html#climate_lib.cesm.build_cesm_filelist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_cesm_filelist</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">run_name</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="s2">&quot;atm&quot;</span><span class="p">,</span>
+                         <span class="n">stream</span><span class="o">=</span><span class="s2">&quot;cam.h0&quot;</span><span class="p">,</span> <span class="n">proc_subdir</span><span class="o">=</span><span class="s2">&quot;atm/proc/tseries/month_1&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Glob together per-variable CESM time-series output files for one run.</span>
+<span class="sd"> </span>
+<span class="sd">    CESM/CAM post-processed time series are typically stored one file per</span>
+<span class="sd">    variable, named like ``&lt;run_name&gt;.&lt;stream&gt;.&lt;VAR&gt;.&lt;dates&gt;.nc``. This</span>
+<span class="sd">    walks a list of variable names and collects all matching files, sorted,</span>
+<span class="sd">    into a single flat list suitable for ``xarray.open_mfdataset``.</span>
+<span class="sd"> </span>
+<span class="sd">    Args:</span>
+<span class="sd">        archive_path (str): Root archive directory containing the run&#39;s output.</span>
+<span class="sd">        run_name (str): CESM case/run name, used both as a subdirectory and filename prefix.</span>
+<span class="sd">        variables (list of str): Variable names to search for.</span>
+<span class="sd">        component (str): Model component subdirectory, e.g. &quot;atm&quot; or &quot;lnd&quot; (default: &quot;atm&quot;); informational, use ``proc_subdir`` for the actual path.</span>
+<span class="sd">        stream (str): Output stream identifier used in filenames, e.g. &quot;cam.h0&quot; or &quot;clm2.h0&quot; (default: &quot;cam.h0&quot;).</span>
+<span class="sd">        proc_subdir (str): Path (relative to ``archive_path/run_name/``) to the post-processed time-series directory (default: &quot;atm/proc/tseries/month_1&quot;).</span>
+<span class="sd"> </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        filelist (list of str): Sorted list of file paths matching all requested variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">run_name</span><span class="p">,</span> <span class="n">proc_subdir</span><span class="p">)</span>
+    <span class="n">filelist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">run_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">stream</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">.*.nc&quot;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">))</span>
+        <span class="n">filelist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filelist</span></div>
 
 </pre></div>
 

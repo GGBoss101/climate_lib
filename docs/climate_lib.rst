@@ -33,6 +33,22 @@ climate\_lib.constants module
    :show-inheritance:
    :undoc-members:
 
+climate\_lib.dataset module
+---------------------------
+
+.. automodule:: climate_lib.dataset
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+climate\_lib.kernels module
+---------------------------
+
+.. automodule:: climate_lib.kernels
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 climate\_lib.plotting module
 ----------------------------
 

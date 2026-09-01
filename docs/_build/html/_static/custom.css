@@ -2,5 +2,4 @@
 section#submodules h2 { display: none !important; }
 .submodules { display: none !important; }
 a[href*="#submodules"] { display: none !important; }
-html { scroll-behavior: smooth;
-transition: scroll-behavior 100.0s ease-in-out; }
+html { scroll-behavior: smooth; }
