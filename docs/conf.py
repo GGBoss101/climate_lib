@@ -8,14 +8,13 @@ import sys
 from importlib.metadata import version as get_version
 sys.path.insert(0, os.path.abspath('..'))
 
-# Safely extract the raw string from Hatch's automatically generated file
-try:
-    with open(os.path.abspath("../src/climate_lib/_version.py"), "r") as f:
-        # Reads the file line looking for __version__ = "1.2.4"
-        exec(f.read()) # This defines the local variable: __version__
-    release = __version__
-except Exception:
-    release = '0.0.0 - unknown' # Clean local fallback if file isn't compiled yet
+# Reads the custom workflow environment variable, then falls back safely
+release = os.environ.get("CLIMATE_LIB_VERSION")
+if not release:
+    try:
+        release = get_version("climate_lib")
+    except Exception:
+        release = "1.2.4" 
 
 version = ".".join(release.split(".")[:2])
 

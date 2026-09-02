@@ -1,9 +1,11 @@
 name: Build and Deploy Sphinx Docs
 
+# 1. Force this workflow to wait until the Automated Release workflow finishes
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Automated Release"]
+    types:
+      - completed
 
 permissions:
   contents: write
@@ -11,9 +13,13 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # 2. Only build the documentation if the release step succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 👈 CRITICAL: Downloads the new tag created by the release workflow
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -21,15 +27,19 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      # 3. Add hatch so hatch-vcs can calculate your dynamic tags
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          # install theme
-          pip install sphinx pydata_sphinx_theme 
+          pip install sphinx pydata_sphinx_theme hatch
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          #install library in editable mode so Sphinx can import it
           pip install -e .
 
+      # 4. Grab the genuine tag string right from your project file
+      - name: Extract Dynamic Version
+        run: echo "CLIMATE_LIB_VERSION=$(hatch version)" >> $GITHUB_ENV
+
+      # 5. Build your code normally
       - name: Build Sphinx HTML
         run: |
           sphinx-apidoc --implicit-namespaces -M -T -f -o docs src/climate_lib
