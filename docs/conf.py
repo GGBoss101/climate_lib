@@ -5,7 +5,12 @@
 
 import os
 import sys
+from importlib.metadata import version as get_version
 sys.path.insert(0, os.path.abspath('..'))
+
+# Automatically query the active environment metadata for this package
+release = get_version("climate_lib")
+version = ".".join(release.split(".")[:2])
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -13,17 +18,6 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'climate_lib'
 copyright = '2026, Dhairya Chopra'
 author = 'Dhairya Chopra'
-
-from importlib.metadata import version as get_version
-
-# Dynamically fetch the version of your installed package
-try:
-    release = get_version("climate_lib")
-    version = ".".join(release.split(".")[:2]) # Extracts '1.2' from '1.2.2'
-except Exception:
-    # Fallback if the package isn't installed in the environment
-    release = "0.0.0 - unknown"
-    version = "0.0 - unknwown"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
