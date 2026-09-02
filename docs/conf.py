@@ -8,8 +8,15 @@ import sys
 from importlib.metadata import version as get_version
 sys.path.insert(0, os.path.abspath('..'))
 
-# Automatically query the active environment metadata for this package
-release = get_version("climate_lib")
+# Safely extract the raw string from Hatch's automatically generated file
+try:
+    with open(os.path.abspath("../src/climate_lib/_version.py"), "r") as f:
+        # Reads the file line looking for __version__ = "1.2.4"
+        exec(f.read()) # This defines the local variable: __version__
+    release = __version__
+except Exception:
+    release = '0.0.0 - unknown' # Clean local fallback if file isn't compiled yet
+
 version = ".".join(release.split(".")[:2])
 
 # -- Project information -----------------------------------------------------
