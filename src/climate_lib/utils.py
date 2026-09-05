@@ -1,5 +1,5 @@
 """
-This module contains helper functions for climateLib, can also be imported/used for other purposes.
+This module contains helper functions for climateLib, but can also be imported/used for other purposes.
 """
 
 # import modules
