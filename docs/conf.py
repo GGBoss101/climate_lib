@@ -17,7 +17,7 @@ if not release:
         release = "1.2.4" 
 
 version = ".".join(release.split(".")[:2])
-
+version = "1.0.0"
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
