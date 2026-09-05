@@ -31,7 +31,7 @@ Now proceed with the General Installation.
 ### General Installation
 Run the following command to install the library:
 ```bash
-pip install git+https://github.com/GGBoss101/climate_lib
+pip install git+https://github.com/computational-climate/climate_lib
 ```
 
 If installed on a conda environment, the library will be usable in the kernel (in Jupyter Lab, etc) corresponding to the environment.
@@ -130,8 +130,8 @@ These prefixes do not trigger a version increment:
 
 ## Documentation
 
-<a href="https://ggboss101.github.io/climate_lib/">Documentation-Link</a>
+<a href="https://computational-climate.github.io/climate_lib/">Documentation-Link</a>
 
 ## Making Changes
 
-<a href="">WikiPage-Link</a>
+<a href="https://app.notion.com/p/2f111d2604a380b991ffcc5ff59258d5?v=2f111d2604a380a2b164000cbd37513e">WikiPage-Link</a>

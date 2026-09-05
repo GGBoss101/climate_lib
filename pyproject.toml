@@ -38,5 +38,5 @@ branches.main = { match = "main" }
 version_source = "tag"
 
 [project.urls]
-Homepage = "https://github.com/GGBoss101/climate_lib"
-Issues = "https://github.com/GGBoss101/climate_lib/issues"
+Homepage = "https://github.com/computational-climate/climate_lib"
+Issues = "https://github.com/computational-climate/climate_lib/issues"
